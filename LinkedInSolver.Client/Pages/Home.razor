@@ -1,0 +1,88 @@
+﻿@page "/"
+@using LinkedInSolver.Client.Models
+@using MudBlazor
+
+<PageTitle>LinkedIn Puzzles Solver</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true" Class="mb-8">
+        LinkedIn Puzzles Solver
+    </MudText>
+    
+    <MudGrid Justify="Justify.Center" Spacing="4">
+        @foreach (var puzzle in puzzles)
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard Class="puzzle-card" Style="cursor: pointer; height: 200px;" @onclick="() => NavigateToPuzzle(puzzle.Route)">
+                    <MudCardContent Class="d-flex flex-column align-center justify-center pa-6">
+                        <img src="@puzzle.Icon" alt="@puzzle.Name" style="width: 64px; height: 64px; margin-bottom: 16px;" />
+                        <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">
+                            @puzzle.Name
+                        </MudText>
+                        <MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Secondary">
+                            @puzzle.Description
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+<style>
+    .puzzle-card {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .puzzle-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.15);
+        border-color: #4f46e5;
+    }
+    
+    .puzzle-card img {
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        transition: transform 0.2s ease;
+    }
+    
+    .puzzle-card:hover img {
+        transform: scale(1.05);
+    }
+</style>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    private List<Puzzle> puzzles = new()
+    {
+        new Puzzle
+        {
+            Name = "Zip",
+            Description = "Complete the path",
+            Icon = "zip.svg",
+            Route = "/zip"
+        },
+        new Puzzle
+        {
+            Name = "Queens",
+            Description = "Crown each region",
+            Icon = "queens.svg",
+            Route = "/queens"
+        },
+        new Puzzle
+        {
+            Name = "Tango",
+            Description = "Harmonize the grid",
+            Icon = "tango.svg",
+            Route = "/tango"
+        }
+    };
+
+    private void NavigateToPuzzle(string route)
+    {
+        Navigation.NavigateTo(route);
+    }
+}
