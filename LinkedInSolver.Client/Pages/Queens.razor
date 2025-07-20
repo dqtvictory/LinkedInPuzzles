@@ -1,4 +1,6 @@
 @page "/queens"
+@using LinkedInSolver.Client.Models
+@using LinkedInSolver.Client.Components
 
 <PageTitle>Queens - LinkedIn Puzzles</PageTitle>
 
@@ -12,19 +14,32 @@
         </MudText>
     </div>
     
-    <MudPaper Class="pa-4 mt-4">
-        <MudText Typo="Typo.body1">
-            Puzzle solver coming soon...
-        </MudText>
-    </MudPaper>
+    <PuzzleGrid CurrentGrid="grid" 
+                OnGridChanged="OnGridChanged" 
+                OnCellClicked="OnCellClicked"
+                PuzzleName="Queens" />
 </MudContainer>
 
 @code {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    private QueensGrid grid = new QueensGrid(8);
 
     private List<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: "/", icon: Icons.Material.Filled.Home),
         new BreadcrumbItem("Queens", href: null, disabled: true)
     };
+
+    private void OnGridChanged(Grid newGrid)
+    {
+        // Create a new QueensGrid with the same size as the newGrid
+        grid = new QueensGrid(newGrid.Size);
+    }
+
+    private void OnCellClicked((int row, int col) cellPosition)
+    {
+        // Handle cell click specific to Queens puzzle if needed
+        // For now, the grid component handles the toggle
+    }
 }
