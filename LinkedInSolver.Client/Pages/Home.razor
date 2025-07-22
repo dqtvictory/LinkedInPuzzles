@@ -10,10 +10,10 @@
     </MudText>
     
     <MudGrid Justify="Justify.Center" Spacing="4">
-        @foreach (var puzzle in puzzles)
+        @foreach (var puzzle in Puzzle.ALL_PUZZLES)
         {
             <MudItem xs="12" sm="6" md="4">
-                <MudCard Class="puzzle-card" Style="cursor: pointer; height: 200px;" @onclick="() => NavigateToPuzzle(puzzle.Route)">
+                <MudCard Class="puzzle-card" Style="cursor: pointer; height: 200px;" @onclick="() => Navigation.NavigateTo(puzzle.Route)">
                     <MudCardContent Class="d-flex flex-column align-center justify-center pa-6">
                         <img src="@puzzle.Icon" alt="@puzzle.Name" style="width: 64px; height: 64px; margin-bottom: 16px;" />
                         <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">
@@ -55,34 +55,4 @@
 
 @code {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
-
-    private List<Puzzle> puzzles = new()
-    {
-        new Puzzle
-        {
-            Name = "Zip",
-            Description = "Complete the path",
-            Icon = "zip.svg",
-            Route = "/zip"
-        },
-        new Puzzle
-        {
-            Name = "Queens",
-            Description = "Crown each region",
-            Icon = "queens.svg",
-            Route = "/queens"
-        },
-        new Puzzle
-        {
-            Name = "Tango",
-            Description = "Harmonize the grid",
-            Icon = "tango.svg",
-            Route = "/tango"
-        }
-    };
-
-    private void NavigateToPuzzle(string route)
-    {
-        Navigation.NavigateTo(route);
-    }
 }

@@ -1,10 +1,20 @@
-namespace LinkedInSolver.Client.Models
+using System.Diagnostics;
+
+namespace LinkedInSolver.Client.Models;
+
+public record Puzzle(string Name, string Description, string Icon, string Route)
 {
-    public class Puzzle
+    public static readonly List<Puzzle> ALL_PUZZLES = new()
     {
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string Icon { get; set; } = string.Empty;
-        public string Route { get; set; } = string.Empty;
+        new Puzzle("Zip", "Complete the path", "zip.svg", "/zip"),
+        new Puzzle("Tango", "Harmonize the grid", "tango.svg", "/tango"),
+        new Puzzle("Queens", "Crown each region", "queens.svg", "/queens")
+    };
+
+    public static Puzzle GetPuzzle(string name)
+    {
+        var puzzle = ALL_PUZZLES.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        Debug.Assert(puzzle != null, $"Puzzle with name '{name}' not found.");
+        return puzzle;
     }
 }

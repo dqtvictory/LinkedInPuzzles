@@ -2,34 +2,34 @@
 @using LinkedInSolver.Client.Models
 @using LinkedInSolver.Client.Components
 
-<PageTitle>Queens - LinkedIn Puzzles</PageTitle>
+<PageTitle>@puzzle.Name - LinkedIn Puzzles</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudBreadcrumbs Items="_breadcrumbItems" Class="mb-4"></MudBreadcrumbs>
-    
+
     <div class="d-flex align-center mb-4">
-        <img src="queens.svg" alt="Queens" style="width: 48px; height: 48px; margin-right: 16px;" />
+        <img src="@puzzle.Icon" alt="@puzzle.Name" style="width: 48px; height: 48px; margin-right: 16px;" />
         <MudText Typo="Typo.h4" GutterBottom="false">
-            Queens
+            @puzzle.Name
         </MudText>
     </div>
-    
-    <PuzzleGrid CurrentGrid="grid" 
-                OnGridChanged="OnGridChanged" 
-                OnCellClicked="OnCellClicked"
-                PuzzleName="Queens" />
+
+    <PuzzleGrid
+        CurrentGrid="grid"
+        OnGridChanged="OnGridChanged"
+        OnCellClicked="OnCellClicked"
+        PuzzleName="@puzzle.Name" />
 </MudContainer>
 
 @code {
+    private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Queens");
     [Inject] private NavigationManager Navigation { get; set; } = default!;
-
-    private QueensGrid grid = new QueensGrid(8);
-
     private List<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: "/", icon: Icons.Material.Filled.Home),
-        new BreadcrumbItem("Queens", href: null, disabled: true)
+        new BreadcrumbItem(puzzle.Name, href: null, disabled: true)
     };
+    private QueensGrid grid = new(Grid.DEFAULT_SIZE);
 
     private void OnGridChanged(Grid newGrid)
     {
