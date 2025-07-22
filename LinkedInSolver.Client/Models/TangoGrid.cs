@@ -12,7 +12,6 @@ public class TangoGrid : Grid
 
     protected override void Initialize()
     {
-        base.Initialize();
         _isActive = new bool[Size, Size];
     }
 
@@ -40,5 +39,5 @@ public class TangoGrid : Grid
         // For now, just a placeholder
     }
 
-    public override bool ShowBorderActions => true;
+    public override bool HasBorderActions => true;
 }

@@ -16,7 +16,6 @@ public class ZipGrid : Grid
 
     protected override void Initialize()
     {
-        base.Initialize();
         _numbers = new int[Size, Size];
         _hasRightWall = new bool[Size, Size];
         _hasBottomWall = new bool[Size, Size];
@@ -135,5 +134,5 @@ public class ZipGrid : Grid
         ToggleWall(pos1, pos2);
     }
 
-    public override bool ShowBorderActions => true;
+    public override bool HasBorderActions => true;
 }
