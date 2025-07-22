@@ -2,20 +2,11 @@
 @using LinkedInSolver.Client.Models
 @using LinkedInSolver.Client.Components
 
-<PuzzleGrid
-    OnGridChanged="OnGridChanged"
-    CurrentPuzzle="puzzle"
-    CurrentGrid="grid" />
+<PuzzleGrid CurrentPuzzle="puzzle" CurrentGrid="grid" />
 
 @code {
     private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Zip");
     
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     private ZipGrid grid = new(Grid.DEFAULT_SIZE);
-
-    private void OnGridChanged(Grid newGrid)
-    {
-        // Create a new ZipGrid with the same size as the newGrid
-        grid = new ZipGrid(newGrid.Size);
-    }
 }

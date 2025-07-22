@@ -234,7 +234,6 @@
 </MudContainer>
 
 @code {
-    [Parameter] public EventCallback<Grid> OnGridChanged { get; set; }
     [Parameter] public Puzzle CurrentPuzzle { get; set; } = null!;
     [Parameter] public Grid CurrentGrid { get; set; } = null!;
 
@@ -255,7 +254,7 @@
         Initialize();
     }
 
-    private async Task OnResizeGrid()
+    private void OnResizeGrid()
     {   
         if (gridSizeInput < Grid.MIN_SIZE || gridSizeInput > Grid.MAX_SIZE)
         {
@@ -267,7 +266,6 @@
 
         Initialize();
         CurrentGrid.Resize(gridSizeInput);
-        await OnGridChanged.InvokeAsync(CurrentGrid);
         StateHasChanged();
     }
 
