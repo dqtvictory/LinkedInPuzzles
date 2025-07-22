@@ -26,8 +26,12 @@ public record struct Pos(int Row, int Col)
         new(1, 1)   // BottomRight
     };
 
+    public static Pos Invalid => new(-1, -1);
+
     public static Pos operator +(Pos a, Pos b) => new(a.Row + b.Row, a.Col + b.Col);
     public static Pos operator -(Pos a, Pos b) => new(a.Row - b.Row, a.Col - b.Col);
+    public static bool operator <(Pos a, Pos b) => (a.Row < b.Row) || (a.Row == b.Row && a.Col < b.Col);
+    public static bool operator >(Pos a, Pos b) => !(a < b || a == b);
 
     public Pos GetNeighbor(Direction direction)
     {

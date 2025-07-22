@@ -1,23 +1,21 @@
 namespace LinkedInSolver.Client.Models;
 
-public class QueensGrid : Grid
+public class QueensGrid(int size) : Grid(size)
 {
     // Queens-specific state array
-    private bool[,] _isActive = null!;
-
-    public QueensGrid(int size = DEFAULT_SIZE) : base(size) {}
+    private bool[,] isActive = null!;
 
     protected override void Initialize()
     {
-        _isActive = new bool[Size, Size];
+        isActive = new bool[Size, Size];
     }
 
-    public bool GetIsActive(Pos pos) => _isActive[pos.Row, pos.Col];
+    public bool GetIsActive(Pos pos) => isActive[pos.Row, pos.Col];
 
     public override void OnCellClick(Pos pos)
     {
         // Queens puzzle logic: toggle cell activation
-        _isActive[pos.Row, pos.Col] = !_isActive[pos.Row, pos.Col];
+        isActive[pos.Row, pos.Col] = !isActive[pos.Row, pos.Col];
     }
 
     public override void OnBorderClick(Pos pos1, Pos pos2)

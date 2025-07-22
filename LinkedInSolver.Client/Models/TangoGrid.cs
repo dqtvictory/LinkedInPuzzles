@@ -1,36 +1,21 @@
 namespace LinkedInSolver.Client.Models;
 
-public class TangoGrid : Grid
+public class TangoGrid(int size) : Grid(size)
 {
     // Tango-specific state array
-    private bool[,] _isActive;
-
-    public TangoGrid(int size = DEFAULT_SIZE) : base(size)
-    {
-        _isActive = new bool[Size, Size];
-    }
+    private bool[,] isActive = null!;
 
     protected override void Initialize()
     {
-        _isActive = new bool[Size, Size];
+        isActive = new bool[Size, Size];
     }
 
-    public override void Resize(int newSize)
-    {
-        base.Resize(newSize);
-    }
-
-    public bool GetIsActive(Pos pos) => _isActive[pos.Row, pos.Col];
-
-    public void ToggleCell(Pos pos)
-    {
-        _isActive[pos.Row, pos.Col] = !_isActive[pos.Row, pos.Col];
-    }
+    public bool GetIsActive(Pos pos) => isActive[pos.Row, pos.Col];
 
     public override void OnCellClick(Pos pos)
     {
         // Tango puzzle logic: toggle cell activation (for now)
-        ToggleCell(pos);
+        isActive[pos.Row, pos.Col] = !isActive[pos.Row, pos.Col];
     }
 
     public override void OnBorderClick(Pos pos1, Pos pos2)

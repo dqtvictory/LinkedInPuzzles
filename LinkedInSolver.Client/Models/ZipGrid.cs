@@ -1,115 +1,59 @@
 namespace LinkedInSolver.Client.Models;
 
-public class ZipGrid : Grid
+public class ZipGrid(int size) : Grid(size)
 {
-    // Zip-specific state arrays
-    private int[,] _numbers;
-    private bool[,] _hasRightWall;
-    private bool[,] _hasBottomWall;
-
-    public ZipGrid(int size = DEFAULT_SIZE) : base(size)
-    {
-        _numbers = new int[Size, Size];
-        _hasRightWall = new bool[Size, Size];
-        _hasBottomWall = new bool[Size, Size];
-    }
+    // Map from a position to a number. If 0, the cell is empty
+    private int[,] posToNum = null!;
+    // Map from a number to a position
+    private Pos[] numToPos = null!;
+    // Set of walls between cells, represented as pairs of positions where first is always compared less than second
+    private HashSet<(Pos, Pos)> walls = null!;
 
     protected override void Initialize()
     {
-        _numbers = new int[Size, Size];
-        _hasRightWall = new bool[Size, Size];
-        _hasBottomWall = new bool[Size, Size];
+        posToNum = new int[Size, Size];
+        numToPos = new Pos[Size * Size + 1]; // +1 to ignore 0 index
+        Array.Fill(numToPos, Pos.Invalid);
+        walls = [];
     }
 
-    public override void Resize(int newSize)
-    {
-        base.Resize(newSize);
-    }
+    // public bool GetHasRightWall(Pos pos) => _hasRightWall[pos.Row, pos.Col];
+    public bool GetHasRightWall(Pos pos) => walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Right)));
 
-    public bool GetHasRightWall(Pos pos) => _hasRightWall[pos.Row, pos.Col];
-
-    public bool GetHasBottomWall(Pos pos) => _hasBottomWall[pos.Row, pos.Col];
+    // public bool GetHasBottomWall(Pos pos) => _hasBottomWall[pos.Row, pos.Col];
+    public bool GetHasBottomWall(Pos pos) => walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Down)));
 
     public void SetCellNumber(Pos pos, int number)
     {
-        _numbers[pos.Row, pos.Col] = number;
+        posToNum[pos.Row, pos.Col] = number;
+        numToPos[number] = pos;
     }
 
     public int GetCellNumber(Pos pos)
     {
-        return _numbers[pos.Row, pos.Col];
+        return posToNum[pos.Row, pos.Col];
     }
 
     public void ClearCellNumber(Pos pos)
     {
-        _numbers[pos.Row, pos.Col] = 0;
+        int number = posToNum[pos.Row, pos.Col];
+        posToNum[pos.Row, pos.Col] = 0;
+        numToPos[number] = Pos.Invalid;
     }
 
     public bool HasNumber(Pos pos) => GetCellNumber(pos) > 0;
 
-    public void ToggleWall(Pos pos1, Pos pos2)
-    {
-        // Determine which wall to toggle based on cell positions
-        if (pos1.Row == pos2.Row) // Vertical wall (between columns)
-        {
-            int minCol = Math.Min(pos1.Col, pos2.Col);
-            int maxCol = Math.Max(pos1.Col, pos2.Col);
-            if (maxCol == minCol + 1) // Adjacent cells
-            {
-                _hasRightWall[pos1.Row, minCol] = !_hasRightWall[pos1.Row, minCol];
-            }
-        }
-        else if (pos1.Col == pos2.Col) // Horizontal wall (between rows)
-        {
-            int minRow = Math.Min(pos1.Row, pos2.Row);
-            int maxRow = Math.Max(pos1.Row, pos2.Row);
-            if (maxRow == minRow + 1) // Adjacent cells
-            {
-                _hasBottomWall[minRow, pos1.Col] = !_hasBottomWall[minRow, pos1.Col];
-            }
-        }
-    }
-
     public int GetSmallestMissingNumber()
     {
-        var usedNumbers = new HashSet<int>();
-        for (int row = 0; row < Size; row++)
-        {
-            for (int col = 0; col < Size; col++)
-            {
-                int number = _numbers[row, col];
-                if (number > 0)
-                {
-                    usedNumbers.Add(number);
-                }
-            }
-        }
-
-        for (int i = 1; i <= Size * Size; i++)
-        {
-            if (!usedNumbers.Contains(i))
-            {
-                return i;
-            }
-        }
-        return Size * Size + 1; // All numbers used
+        return Enumerable.Range(1, Size * Size)
+            .FirstOrDefault(i => numToPos[i] == Pos.Invalid, -1);
     }
 
     public int GetMaxNumber()
     {
-        int maxNumber = 0;
-        for (int row = 0; row < Size; row++)
-        {
-            for (int col = 0; col < Size; col++)
-            {
-                int number = _numbers[row, col];
-                if (number > maxNumber)
-                {
-                    maxNumber = number;
-                }
-            }
-        }
-        return maxNumber;
+        return Enumerable.Range(1, Size * Size)
+            .Reverse()
+            .FirstOrDefault(i => numToPos[i] != Pos.Invalid, -1);
     }
 
     public override void OnCellClick(Pos pos)
@@ -131,7 +75,11 @@ public class ZipGrid : Grid
     public override void OnBorderClick(Pos pos1, Pos pos2)
     {
         // Zip puzzle: toggle walls between cells
-        ToggleWall(pos1, pos2);
+        var wall = pos1 < pos2 ? (pos1, pos2) : (pos2, pos1);
+        if (!walls.Remove(wall))
+        {
+            walls.Add(wall);
+        }
     }
 
     public override bool HasBorderActions => true;

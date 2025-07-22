@@ -159,29 +159,9 @@
                     var col = i % CurrentGrid.Size; 
                     var pos = new Pos(row, col);
                     
-                    var wallClasses = new List<string>();
-                    
-                    // Only add wall classes if this is a ZipGrid
-                    if (CurrentGrid is ZipGrid zipGrid)
-                    {
-                        if (zipGrid.GetHasRightWall(pos)) wallClasses.Add("right-wall");
-                        if (zipGrid.GetHasBottomWall(pos)) wallClasses.Add("bottom-wall");
+                    List<string> borderClasses = GetBorderClasses(pos);
+                    var cellClasses = $"grid-cell {string.Join(" ", borderClasses)}";
 
-                        // Add corresponding walls on adjacent cells to avoid holes
-                        if (col > 0 && zipGrid.GetHasRightWall(pos.GetNeighbor(Pos.Direction.Left))) wallClasses.Add("left-wall");
-                        if (row > 0 && zipGrid.GetHasBottomWall(pos.GetNeighbor(Pos.Direction.Up))) wallClasses.Add("top-wall");
-                    }
-                    
-                    // Determine if cell is active based on puzzle type
-                    bool isActive = CurrentGrid switch
-                    {
-                        QueensGrid queensGrid => queensGrid.GetIsActive(pos),
-                        TangoGrid tangoGrid => tangoGrid.GetIsActive(pos),
-                        _ => false
-                    };
-                    
-                    var cellClasses = $"grid-cell {(isActive ? "active" : "")} {string.Join(" ", wallClasses)}";
-                    
                     <div class="@cellClasses" 
                         @onclick="() => OnCellClick(pos)">
                         @if (CurrentGrid is ZipGrid zipGridForNumber)
@@ -236,6 +216,7 @@
 @code {
     [Parameter] public Puzzle CurrentPuzzle { get; set; } = null!;
     [Parameter] public Grid CurrentGrid { get; set; } = null!;
+    [Parameter] public Func<Pos, List<string>> GetBorderClasses { get; set; } = null!;
 
     private int gridSizeInput = Grid.DEFAULT_SIZE;
     private bool showError = false;
