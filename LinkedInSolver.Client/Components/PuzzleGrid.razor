@@ -145,37 +145,38 @@
                 var row = i / CurrentGrid.Size;
                 var col = i % CurrentGrid.Size;
                 var cell = CurrentGrid.Cells[row, col];
+                var pos = new Pos(row, col);
                 
                 var wallClasses = new List<string>();
                 
                 // Only add wall classes if this is a ZipGrid
                 if (CurrentGrid is ZipGrid zipGrid)
                 {
-                    if (zipGrid.GetHasRightWall(row, col)) wallClasses.Add("right-wall");
-                    if (zipGrid.GetHasBottomWall(row, col)) wallClasses.Add("bottom-wall");
-                    
+                    if (zipGrid.GetHasRightWall(pos)) wallClasses.Add("right-wall");
+                    if (zipGrid.GetHasBottomWall(pos)) wallClasses.Add("bottom-wall");
+
                     // Add corresponding walls on adjacent cells to avoid holes
-                    if (col > 0 && zipGrid.GetHasRightWall(row, col - 1)) wallClasses.Add("left-wall");
-                    if (row > 0 && zipGrid.GetHasBottomWall(row - 1, col)) wallClasses.Add("top-wall");
+                    if (col > 0 && zipGrid.GetHasRightWall(pos.GetNeighbor(Pos.Direction.Left))) wallClasses.Add("left-wall");
+                    if (row > 0 && zipGrid.GetHasBottomWall(pos.GetNeighbor(Pos.Direction.Up))) wallClasses.Add("top-wall");
                 }
                 
                 // Determine if cell is active based on puzzle type
                 bool isActive = CurrentGrid switch
                 {
-                    QueensGrid queensGrid => queensGrid.GetIsActive(row, col),
-                    TangoGrid tangoGrid => tangoGrid.GetIsActive(row, col),
+                    QueensGrid queensGrid => queensGrid.GetIsActive(pos),
+                    TangoGrid tangoGrid => tangoGrid.GetIsActive(pos),
                     _ => false
                 };
                 
                 var cellClasses = $"grid-cell {(isActive ? "active" : "")} {string.Join(" ", wallClasses)}";
                 
                 <div class="@cellClasses" 
-                     @onclick="() => OnCellClick(row, col)">
+                     @onclick="() => OnCellClick(pos)">
                     @if (CurrentGrid is ZipGrid zipGridForNumber)
                     {
-                        if (zipGridForNumber.HasNumber(row, col))
+                        if (zipGridForNumber.HasNumber(pos))
                         {
-                            var cellNumber = zipGridForNumber.GetCellNumber(row, col);
+                            var cellNumber = zipGridForNumber.GetCellNumber(pos);
                             var maxNumber = zipGridForNumber.GetMaxNumber();
                             var isFirstOrLast = cellNumber == 1 || cellNumber == maxNumber;
                             <span class="cell-number @(isFirstOrLast ? "first-last" : "")">@cellNumber</span>
@@ -191,7 +192,7 @@
                     {
                         <div class="border-button horizontal" 
                              style="top: @((row + 1) * 62 + 8 - 12)px; left: @(col * 62 + 8 + 30 - 12)px;"
-                             @onclick="() => OnBorderClick(row, col, row + 1, col)">
+                             @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Down))">
                             <span class="plus-icon">+</span>
                         </div>
                     }
@@ -201,7 +202,7 @@
                     {
                         <div class="border-button vertical" 
                              style="top: @(row * 62 + 8 + 30 - 12)px; left: @((col + 1) * 62 + 8 - 12)px;"
-                             @onclick="() => OnBorderClick(row, col, row, col + 1)">
+                             @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Right))">
                             <span class="plus-icon">+</span>
                         </div>
                     }
@@ -221,17 +222,18 @@
 @code {
     [Parameter] public Grid CurrentGrid { get; set; } = new Grid(Grid.DEFAULT_SIZE);
     [Parameter] public EventCallback<Grid> OnGridChanged { get; set; }
-    [Parameter] public EventCallback<(int row, int col)> OnCellClicked { get; set; }
+    [Parameter] public EventCallback<Pos> OnCellClicked { get; set; }
     [Parameter] public string PuzzleName { get; set; } = string.Empty;
 
     private int gridSizeInput = Grid.DEFAULT_SIZE;
     private bool showError = false;
-    private string errorMessage = "";
-    private string debugMessage = "";
+    private string errorMessage = string.Empty;
+    private string debugMessage = string.Empty;
 
     protected override void OnInitialized()
     {
-        gridSizeInput = CurrentGrid.Size;
+        gridSizeInput = Grid.DEFAULT_SIZE;
+        Initialize();
     }
 
     private async Task OnResizeGrid()
@@ -244,27 +246,31 @@
             return;
         }
 
-        showError = false;
-        errorMessage = "";
-        debugMessage = ""; // Clear debug message on resize
+        Initialize();
         CurrentGrid.Resize(gridSizeInput);
         await OnGridChanged.InvokeAsync(CurrentGrid);
         StateHasChanged();
     }
 
-    private async Task OnCellClick(int row, int col)
+    private void Initialize()
+    {
+        showError = false;
+        errorMessage = string.Empty;
+        debugMessage = string.Empty;
+    }
+
+    private async Task OnCellClick(Pos pos)
     {
         // Use polymorphic method - each grid type handles its own logic
-        CurrentGrid.OnCellClick(row, col);
-        await OnCellClicked.InvokeAsync((row, col));
+        CurrentGrid.OnCellClick(pos);
+        await OnCellClicked.InvokeAsync(pos);
         StateHasChanged();
     }
-    
-    private void OnBorderClick(int row1, int col1, int row2, int col2)
+
+    private void OnBorderClick(Pos pos1, Pos pos2)
     {
-        // Use polymorphic method - each grid type handles its own border actions
-        CurrentGrid.OnBorderClick(row1, col1, row2, col2);
-        debugMessage = $"{PuzzleName}: Border action between ({row1},{col1}) and ({row2},{col2})";
+        CurrentGrid.OnBorderClick(pos1, pos2);
+        debugMessage = $"{PuzzleName}: Border action between ({pos1}) and ({pos2})";
         StateHasChanged();
     }
 }

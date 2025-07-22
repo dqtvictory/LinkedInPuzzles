@@ -21,20 +21,20 @@ public class TangoGrid : Grid
         base.Resize(newSize);
     }
 
-    public bool GetIsActive(int row, int col) => _isActive[row, col];
+    public bool GetIsActive(Pos pos) => _isActive[pos.Row, pos.Col];
 
-    public void ToggleCell(int row, int col)
+    public void ToggleCell(Pos pos)
     {
-        _isActive[row, col] = !_isActive[row, col];
+        _isActive[pos.Row, pos.Col] = !_isActive[pos.Row, pos.Col];
     }
 
-    public override void OnCellClick(int row, int col)
+    public override void OnCellClick(Pos pos)
     {
         // Tango puzzle logic: toggle cell activation (for now)
-        ToggleCell(row, col);
+        ToggleCell(pos);
     }
 
-    public override void OnBorderClick(int row1, int col1, int row2, int col2)
+    public override void OnBorderClick(Pos pos1, Pos pos2)
     {
         // Tango puzzle: border logic (to be implemented)
         // For now, just a placeholder

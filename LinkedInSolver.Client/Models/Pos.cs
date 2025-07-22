@@ -1,19 +1,49 @@
 namespace LinkedInSolver.Client.Models;
 
-public record Pos(int Row, int Col)
+public record struct Pos(int Row, int Col)
 {
+    public enum Direction
+    {
+        Up,
+        Down,
+        Left,
+        Right,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    }
+
+    private static readonly Pos[] _directions =
+    {
+        new(-1, 0), // Up
+        new(1, 0),  // Down
+        new(0, -1), // Left
+        new(0, 1),  // Right
+        new(-1, -1),// TopLeft
+        new(-1, 1), // TopRight
+        new(1, -1), // BottomLeft
+        new(1, 1)   // BottomRight
+    };
+
     public static Pos operator +(Pos a, Pos b) => new(a.Row + b.Row, a.Col + b.Col);
     public static Pos operator -(Pos a, Pos b) => new(a.Row - b.Row, a.Col - b.Col);
+
+    public Pos GetNeighbor(Direction direction)
+    {
+        var offset = _directions[(int)direction];
+        return this + offset;
+    }
 
     /// <summary>
     /// Gets the 4 orthogonal neighbors (up, down, left, right)
     /// </summary>
     public IEnumerable<Pos> GetNeighbors()
     {
-        yield return new Pos(Row - 1, Col);     // Up
-        yield return new Pos(Row + 1, Col);     // Down
-        yield return new Pos(Row, Col - 1);     // Left
-        yield return new Pos(Row, Col + 1);     // Right
+        yield return GetNeighbor(Direction.Up);
+        yield return GetNeighbor(Direction.Down);
+        yield return GetNeighbor(Direction.Left);
+        yield return GetNeighbor(Direction.Right);
     }
 
     /// <summary>
@@ -21,10 +51,10 @@ public record Pos(int Row, int Col)
     /// </summary>
     public IEnumerable<Pos> GetDiagNeighbors()
     {
-        yield return new Pos(Row - 1, Col - 1); // Top-left
-        yield return new Pos(Row - 1, Col + 1); // Top-right
-        yield return new Pos(Row + 1, Col - 1); // Bottom-left
-        yield return new Pos(Row + 1, Col + 1); // Bottom-right
+        yield return GetNeighbor(Direction.TopLeft);
+        yield return GetNeighbor(Direction.TopRight);
+        yield return GetNeighbor(Direction.BottomLeft);
+        yield return GetNeighbor(Direction.BottomRight);
     }
 
     /// <summary>

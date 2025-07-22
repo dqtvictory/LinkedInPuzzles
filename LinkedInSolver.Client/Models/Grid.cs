@@ -35,12 +35,12 @@ public class Grid
         }
     }
 
-    public virtual void OnCellClick(int row, int col)
+    public virtual void OnCellClick(Pos pos)
     {
         // Default behavior - do nothing (let subclasses override)
     }
 
-    public virtual void OnBorderClick(int row1, int col1, int row2, int col2)
+    public virtual void OnBorderClick(Pos pos1, Pos pos2)
     {
         // Default behavior - no action (can be overridden by subclasses)
     }

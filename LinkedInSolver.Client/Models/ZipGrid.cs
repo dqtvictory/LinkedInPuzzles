@@ -27,46 +27,46 @@ public class ZipGrid : Grid
         base.Resize(newSize);
     }
 
-    public bool GetHasRightWall(int row, int col) => _hasRightWall[row, col];
+    public bool GetHasRightWall(Pos pos) => _hasRightWall[pos.Row, pos.Col];
 
-    public bool GetHasBottomWall(int row, int col) => _hasBottomWall[row, col];
+    public bool GetHasBottomWall(Pos pos) => _hasBottomWall[pos.Row, pos.Col];
 
-    public void SetCellNumber(int row, int col, int number)
+    public void SetCellNumber(Pos pos, int number)
     {
-        _numbers[row, col] = number;
+        _numbers[pos.Row, pos.Col] = number;
     }
 
-    public int GetCellNumber(int row, int col)
+    public int GetCellNumber(Pos pos)
     {
-        return _numbers[row, col];
+        return _numbers[pos.Row, pos.Col];
     }
 
-    public void ClearCellNumber(int row, int col)
+    public void ClearCellNumber(Pos pos)
     {
-        _numbers[row, col] = 0;
+        _numbers[pos.Row, pos.Col] = 0;
     }
 
-    public bool HasNumber(int row, int col) => GetCellNumber(row, col) > 0;
+    public bool HasNumber(Pos pos) => GetCellNumber(pos) > 0;
 
-    public void ToggleWall(int row1, int col1, int row2, int col2)
+    public void ToggleWall(Pos pos1, Pos pos2)
     {
         // Determine which wall to toggle based on cell positions
-        if (row1 == row2) // Vertical wall (between columns)
+        if (pos1.Row == pos2.Row) // Vertical wall (between columns)
         {
-            int minCol = Math.Min(col1, col2);
-            int maxCol = Math.Max(col1, col2);
+            int minCol = Math.Min(pos1.Col, pos2.Col);
+            int maxCol = Math.Max(pos1.Col, pos2.Col);
             if (maxCol == minCol + 1) // Adjacent cells
             {
-                _hasRightWall[row1, minCol] = !_hasRightWall[row1, minCol];
+                _hasRightWall[pos1.Row, minCol] = !_hasRightWall[pos1.Row, minCol];
             }
         }
-        else if (col1 == col2) // Horizontal wall (between rows)
+        else if (pos1.Col == pos2.Col) // Horizontal wall (between rows)
         {
-            int minRow = Math.Min(row1, row2);
-            int maxRow = Math.Max(row1, row2);
+            int minRow = Math.Min(pos1.Row, pos2.Row);
+            int maxRow = Math.Max(pos1.Row, pos2.Row);
             if (maxRow == minRow + 1) // Adjacent cells
             {
-                _hasBottomWall[minRow, col1] = !_hasBottomWall[minRow, col1];
+                _hasBottomWall[minRow, pos1.Col] = !_hasBottomWall[minRow, pos1.Col];
             }
         }
     }
@@ -113,26 +113,26 @@ public class ZipGrid : Grid
         return maxNumber;
     }
 
-    public override void OnCellClick(int row, int col)
+    public override void OnCellClick(Pos pos)
     {
         // Zip puzzle logic: toggle numbers
-        if (HasNumber(row, col))
+        if (HasNumber(pos))
         {
             // Remove number from cell
-            ClearCellNumber(row, col);
+            ClearCellNumber(pos);
         }
         else
         {
             // Add smallest missing number
             var smallestNumber = GetSmallestMissingNumber();
-            SetCellNumber(row, col, smallestNumber);
+            SetCellNumber(pos, smallestNumber);
         }
     }
 
-    public override void OnBorderClick(int row1, int col1, int row2, int col2)
+    public override void OnBorderClick(Pos pos1, Pos pos2)
     {
         // Zip puzzle: toggle walls between cells
-        ToggleWall(row1, col1, row2, col2);
+        ToggleWall(pos1, pos2);
     }
 
     public override bool ShowBorderActions => true;
