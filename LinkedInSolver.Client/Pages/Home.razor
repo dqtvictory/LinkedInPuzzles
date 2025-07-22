@@ -29,30 +29,6 @@
     </MudGrid>
 </MudContainer>
 
-<style>
-    .puzzle-card {
-        background: linear-gradient(145deg, #ffffff, #f8f9fa);
-        border: 1px solid #e9ecef;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-    }
-    
-    .puzzle-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.15);
-        border-color: #4f46e5;
-    }
-    
-    .puzzle-card img {
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        transition: transform 0.2s ease;
-    }
-    
-    .puzzle-card:hover img {
-        transform: scale(1.05);
-    }
-</style>
-
 @code {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
 }

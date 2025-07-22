@@ -1,104 +1,5 @@
 @using LinkedInSolver.Client.Models
 
-<div class="d-flex justify-center mb-4">
-    <div class="d-flex align-center">
-        <MudTextField @bind-Value="gridSizeInput" 
-                      Label="Grid Size" 
-                      Variant="Variant.Outlined" 
-                      Margin="Margin.Dense"
-                      Style="width: 120px; margin-right: 16px;"
-                      Error="@showError"
-                      ErrorText="@errorMessage"
-                      T="int" />
-        <MudButton Variant="Variant.Filled" 
-                   Color="Color.Primary" 
-                   @onclick="OnResizeGrid">
-            New Grid
-        </MudButton>
-    </div>
-</div>
-
-<div class="grid-container">
-    <div class="puzzle-grid-wrapper">
-        <div class="puzzle-grid" style="grid-template-columns: repeat(@CurrentGrid.Size, 1fr); grid-template-rows: repeat(@CurrentGrid.Size, 1fr);">
-            @for (int i = 0; i < CurrentGrid.Size * CurrentGrid.Size; i++)
-            {
-                var row = i / CurrentGrid.Size;
-                var col = i % CurrentGrid.Size;
-                var cell = CurrentGrid.Cells[row, col];
-                
-                var wallClasses = new List<string>();
-                
-                // Only add wall classes if this is a ZipGrid
-                if (CurrentGrid is ZipGrid zipGrid)
-                {
-                    if (zipGrid.GetHasRightWall(row, col)) wallClasses.Add("right-wall");
-                    if (zipGrid.GetHasBottomWall(row, col)) wallClasses.Add("bottom-wall");
-                    
-                    // Add corresponding walls on adjacent cells to avoid holes
-                    if (col > 0 && zipGrid.GetHasRightWall(row, col - 1)) wallClasses.Add("left-wall");
-                    if (row > 0 && zipGrid.GetHasBottomWall(row - 1, col)) wallClasses.Add("top-wall");
-                }
-                
-                // Determine if cell is active based on puzzle type
-                bool isActive = CurrentGrid switch
-                {
-                    QueensGrid queensGrid => queensGrid.GetIsActive(row, col),
-                    TangoGrid tangoGrid => tangoGrid.GetIsActive(row, col),
-                    _ => false
-                };
-                
-                var cellClasses = $"grid-cell {(isActive ? "active" : "")} {string.Join(" ", wallClasses)}";
-                
-                <div class="@cellClasses" 
-                     @onclick="() => OnCellClick(row, col)">
-                    @if (CurrentGrid is ZipGrid zipGridForNumber)
-                    {
-                        if (zipGridForNumber.HasNumber(row, col))
-                        {
-                            var cellNumber = zipGridForNumber.GetCellNumber(row, col);
-                            var maxNumber = zipGridForNumber.GetMaxNumber();
-                            var isFirstOrLast = cellNumber == 1 || cellNumber == maxNumber;
-                            <span class="cell-number @(isFirstOrLast ? "first-last" : "")">@cellNumber</span>
-                        }
-                    }
-                </div>
-                
-                <!-- Border action buttons for this cell position -->
-                @if (CurrentGrid.ShowBorderActions)
-                {
-                    // Horizontal border button (below current cell)
-                    if (row < CurrentGrid.Size - 1)
-                    {
-                        <div class="border-button horizontal" 
-                             style="top: @((row + 1) * 62 + 8 - 12)px; left: @(col * 62 + 8 + 30 - 12)px;"
-                             @onclick="() => OnBorderClick(row, col, row + 1, col)">
-                            <span class="plus-icon">+</span>
-                        </div>
-                    }
-                    
-                    // Vertical border button (right of current cell)
-                    if (col < CurrentGrid.Size - 1)
-                    {
-                        <div class="border-button vertical" 
-                             style="top: @(row * 62 + 8 + 30 - 12)px; left: @((col + 1) * 62 + 8 - 12)px;"
-                             @onclick="() => OnBorderClick(row, col, row, col + 1)">
-                            <span class="plus-icon">+</span>
-                        </div>
-                    }
-                }
-            }
-        </div>
-    </div>
-</div>
-
-@if (!string.IsNullOrEmpty(debugMessage))
-{
-    <div class="debug-message">
-        @debugMessage
-    </div>
-}
-
 <style>
     .grid-container {
         display: flex;
@@ -218,13 +119,112 @@
     }
 </style>
 
+<div class="d-flex justify-center mb-4">
+    <div class="d-flex align-center">
+        <MudTextField @bind-Value="gridSizeInput" 
+                      Label="Grid Size" 
+                      Variant="Variant.Outlined" 
+                      Margin="Margin.Dense"
+                      Style="width: 120px; margin-right: 16px;"
+                      Error="@showError"
+                      ErrorText="@errorMessage"
+                      T="int" />
+        <MudButton Variant="Variant.Filled" 
+                   Color="Color.Primary" 
+                   @onclick="OnResizeGrid">
+            New Grid
+        </MudButton>
+    </div>
+</div>
+
+<div class="grid-container">
+    <div class="puzzle-grid-wrapper">
+        <div class="puzzle-grid" style="grid-template-columns: repeat(@CurrentGrid.Size, 1fr); grid-template-rows: repeat(@CurrentGrid.Size, 1fr);">
+            @for (int i = 0; i < CurrentGrid.Size * CurrentGrid.Size; i++)
+            {
+                var row = i / CurrentGrid.Size;
+                var col = i % CurrentGrid.Size;
+                var cell = CurrentGrid.Cells[row, col];
+                
+                var wallClasses = new List<string>();
+                
+                // Only add wall classes if this is a ZipGrid
+                if (CurrentGrid is ZipGrid zipGrid)
+                {
+                    if (zipGrid.GetHasRightWall(row, col)) wallClasses.Add("right-wall");
+                    if (zipGrid.GetHasBottomWall(row, col)) wallClasses.Add("bottom-wall");
+                    
+                    // Add corresponding walls on adjacent cells to avoid holes
+                    if (col > 0 && zipGrid.GetHasRightWall(row, col - 1)) wallClasses.Add("left-wall");
+                    if (row > 0 && zipGrid.GetHasBottomWall(row - 1, col)) wallClasses.Add("top-wall");
+                }
+                
+                // Determine if cell is active based on puzzle type
+                bool isActive = CurrentGrid switch
+                {
+                    QueensGrid queensGrid => queensGrid.GetIsActive(row, col),
+                    TangoGrid tangoGrid => tangoGrid.GetIsActive(row, col),
+                    _ => false
+                };
+                
+                var cellClasses = $"grid-cell {(isActive ? "active" : "")} {string.Join(" ", wallClasses)}";
+                
+                <div class="@cellClasses" 
+                     @onclick="() => OnCellClick(row, col)">
+                    @if (CurrentGrid is ZipGrid zipGridForNumber)
+                    {
+                        if (zipGridForNumber.HasNumber(row, col))
+                        {
+                            var cellNumber = zipGridForNumber.GetCellNumber(row, col);
+                            var maxNumber = zipGridForNumber.GetMaxNumber();
+                            var isFirstOrLast = cellNumber == 1 || cellNumber == maxNumber;
+                            <span class="cell-number @(isFirstOrLast ? "first-last" : "")">@cellNumber</span>
+                        }
+                    }
+                </div>
+                
+                <!-- Border action buttons for this cell position -->
+                @if (CurrentGrid.ShowBorderActions)
+                {
+                    // Horizontal border button (below current cell)
+                    if (row < CurrentGrid.Size - 1)
+                    {
+                        <div class="border-button horizontal" 
+                             style="top: @((row + 1) * 62 + 8 - 12)px; left: @(col * 62 + 8 + 30 - 12)px;"
+                             @onclick="() => OnBorderClick(row, col, row + 1, col)">
+                            <span class="plus-icon">+</span>
+                        </div>
+                    }
+                    
+                    // Vertical border button (right of current cell)
+                    if (col < CurrentGrid.Size - 1)
+                    {
+                        <div class="border-button vertical" 
+                             style="top: @(row * 62 + 8 + 30 - 12)px; left: @((col + 1) * 62 + 8 - 12)px;"
+                             @onclick="() => OnBorderClick(row, col, row, col + 1)">
+                            <span class="plus-icon">+</span>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(debugMessage))
+{
+    <div class="debug-message">
+        @debugMessage
+    </div>
+}
+
 @code {
-    [Parameter] public Grid CurrentGrid { get; set; } = new Grid(8);
+    [Parameter] public Grid CurrentGrid { get; set; } = new Grid(Grid.DEFAULT_SIZE);
     [Parameter] public EventCallback<Grid> OnGridChanged { get; set; }
     [Parameter] public EventCallback<(int row, int col)> OnCellClicked { get; set; }
-    [Parameter] public string PuzzleName { get; set; } = "Unknown";
+    [Parameter] public string PuzzleName { get; set; } = string.Empty;
 
-    private int gridSizeInput = 8;
+    private int gridSizeInput = Grid.DEFAULT_SIZE;
     private bool showError = false;
     private string errorMessage = "";
     private string debugMessage = "";
