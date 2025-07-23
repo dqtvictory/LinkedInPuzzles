@@ -174,8 +174,10 @@
                         // Horizontal border button (below current cell)
                         if (row < CurrentGrid.Size - 1)
                         {
+                            var hTop = GetHorizontalBorderTop(pos);
+                            var hLeft = GetHorizontalBorderLeft(pos);
                             <div class="border-button horizontal" 
-                                style="top: @((row + 1) * 62 + 8 - 12)px; left: @(col * 62 + 8 + 30 - 12)px;"
+                                style="top: @(hTop)px; left: @(hLeft)px;"
                                 @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Down))">
                                 <span class="plus-icon">+</span>
                             </div>
@@ -184,8 +186,10 @@
                         // Vertical border button (right of current cell)
                         if (col < CurrentGrid.Size - 1)
                         {
+                            var vTop = GetVerticalBorderTop(pos);
+                            var vLeft = GetVerticalBorderLeft(pos);
                             <div class="border-button vertical" 
-                                style="top: @(row * 62 + 8 + 30 - 12)px; left: @((col + 1) * 62 + 8 - 12)px;"
+                                style="top: @(vTop)px; left: @(vLeft)px;"
                                 @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Right))">
                                 <span class="plus-icon">+</span>
                             </div>
@@ -206,6 +210,12 @@
 </MudContainer>
 
 @code {
+    // Dynamic positioning constants (taken from CSS)
+    const int CELL_SIZE = 60;
+    const int CELL_GAP = 1;
+    const int GRID_PADDING = 8;
+    const int BORDER_BUTTON_SIZE = 24;
+
     [Parameter] public Puzzle CurrentPuzzle { get; set; } = null!;
     [Parameter] public Grid CurrentGrid { get; set; } = null!;
     [Parameter] public Func<Pos, List<string>> GetCellClassesForDiv { get; set; } = null!;
@@ -266,5 +276,29 @@
         CurrentGrid.OnBorderClick(pos1, pos2);
         debugMessage = $"{CurrentPuzzle.Name}: Border action between {pos1} and {pos2}";
         StateHasChanged();
+    }
+
+    private int GetHorizontalBorderTop(Pos pos)
+    {
+        // Position at the bottom of the current cell
+        return GRID_PADDING + (pos.Row + 1) * (CELL_SIZE + CELL_GAP) - (BORDER_BUTTON_SIZE / 2);
+    }
+
+    private int GetHorizontalBorderLeft(Pos pos)
+    {
+        // Position at the center of the current cell
+        return GRID_PADDING + pos.Col * (CELL_SIZE + CELL_GAP) + (CELL_SIZE / 2) - (BORDER_BUTTON_SIZE / 2);
+    }
+
+    private int GetVerticalBorderTop(Pos pos)
+    {
+        // Position at the center of the current cell
+        return GRID_PADDING + pos.Row * (CELL_SIZE + CELL_GAP) + (CELL_SIZE / 2) - (BORDER_BUTTON_SIZE / 2);
+    }
+
+    private int GetVerticalBorderLeft(Pos pos)
+    {
+        // Position at the right of the current cell
+        return GRID_PADDING + (pos.Col + 1) * (CELL_SIZE + CELL_GAP) - (BORDER_BUTTON_SIZE / 2);
     }
 }

@@ -17,12 +17,26 @@
     private List<string> getCellClasses(Pos pos)
     {
         var classes = new List<string>();
-        if (grid.GetHasRightWall(pos)) classes.Add("right-wall");
-        if (grid.GetHasBottomWall(pos)) classes.Add("bottom-wall");
+        
+        if (grid.GetHasRightWall(pos))
+        {
+            classes.Add("right-wall");
+        }
 
-        // Add corresponding walls on adjacent cells to avoid holes
-        if (pos.Col > 0 && grid.GetHasRightWall(pos.GetNeighbor(Pos.Direction.Left))) classes.Add("left-wall");
-        if (pos.Row > 0 && grid.GetHasBottomWall(pos.GetNeighbor(Pos.Direction.Up))) classes.Add("top-wall");
+        if (grid.GetHasBottomWall(pos))
+        {
+            classes.Add("bottom-wall");
+        }
+
+        if (pos.Col > 0 && grid.GetHasRightWall(pos.GetNeighbor(Pos.Direction.Left)))
+        {
+            classes.Add("left-wall");
+        }
+        
+        if (pos.Row > 0 && grid.GetHasBottomWall(pos.GetNeighbor(Pos.Direction.Up)))
+        {
+            classes.Add("top-wall");
+        }
 
         return classes;
     }
