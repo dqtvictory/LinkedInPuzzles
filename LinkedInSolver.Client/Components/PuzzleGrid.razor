@@ -159,24 +159,16 @@
                     var col = i % CurrentGrid.Size; 
                     var pos = new Pos(row, col);
                     
-                    List<string> borderClasses = GetBorderClasses(pos);
+                    List<string> borderClasses = GetCellClassesForDiv(pos);
                     var cellClasses = $"grid-cell {string.Join(" ", borderClasses)}";
 
-                    <div class="@cellClasses" 
+                    <!-- cell contents -->
+                    <div class="@cellClasses"
                         @onclick="() => OnCellClick(pos)">
-                        @if (CurrentGrid is ZipGrid zipGridForNumber)
-                        {
-                            if (zipGridForNumber.HasNumber(pos))
-                            {
-                                var cellNumber = zipGridForNumber.GetCellNumber(pos);
-                                var maxNumber = zipGridForNumber.GetMaxNumber();
-                                var isFirstOrLast = cellNumber == 1 || cellNumber == maxNumber;
-                                <span class="cell-number @(isFirstOrLast ? "first-last" : "")">@cellNumber</span>
-                            }
-                        }
+                        @GetCellContent(pos)
                     </div>
-                    
-                    <!-- Border action buttons for this cell position -->
+
+                    <!-- cell borders -->
                     @if (CurrentGrid.HasBorderActions)
                     {
                         // Horizontal border button (below current cell)
@@ -216,7 +208,8 @@
 @code {
     [Parameter] public Puzzle CurrentPuzzle { get; set; } = null!;
     [Parameter] public Grid CurrentGrid { get; set; } = null!;
-    [Parameter] public Func<Pos, List<string>> GetBorderClasses { get; set; } = null!;
+    [Parameter] public Func<Pos, List<string>> GetCellClassesForDiv { get; set; } = null!;
+    [Parameter] public Func<Pos, RenderFragment?> GetCellContent { get; set; } = null!;
 
     private int gridSizeInput = Grid.DEFAULT_SIZE;
     private bool showError = false;
