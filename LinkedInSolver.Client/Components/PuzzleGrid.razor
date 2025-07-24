@@ -155,12 +155,12 @@
             <div class="puzzle-grid" style="grid-template-columns: repeat(@CurrentGrid.Size, 1fr); grid-template-rows: repeat(@CurrentGrid.Size, 1fr);">
                 @for (int i = 0; i < CurrentGrid.Size * CurrentGrid.Size; i++)
                 {
-                    var row = i / CurrentGrid.Size;
-                    var col = i % CurrentGrid.Size; 
-                    var pos = new Pos(row, col);
+                    int row = i / CurrentGrid.Size;
+                    int col = i % CurrentGrid.Size; 
+                    Pos pos = new(row, col);
                     
                     List<string> borderClasses = GetCellClassesForDiv(pos);
-                    var cellClasses = $"grid-cell {string.Join(" ", borderClasses)}";
+                    string cellClasses = $"grid-cell {string.Join(" ", borderClasses)}";
 
                     <!-- cell contents -->
                     <div class="@cellClasses"
@@ -174,8 +174,8 @@
                         // Horizontal border button (below current cell)
                         if (row < CurrentGrid.Size - 1)
                         {
-                            var hTop = GetHorizontalBorderTop(pos);
-                            var hLeft = GetHorizontalBorderLeft(pos);
+                            int hTop = GetHorizontalBorderTop(pos);
+                            int hLeft = GetHorizontalBorderLeft(pos);
                             <div class="border-button horizontal" 
                                 style="top: @(hTop)px; left: @(hLeft)px;"
                                 @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Down))">
@@ -186,8 +186,8 @@
                         // Vertical border button (right of current cell)
                         if (col < CurrentGrid.Size - 1)
                         {
-                            var vTop = GetVerticalBorderTop(pos);
-                            var vLeft = GetVerticalBorderLeft(pos);
+                            int vTop = GetVerticalBorderTop(pos);
+                            int vLeft = GetVerticalBorderLeft(pos);
                             <div class="border-button vertical" 
                                 style="top: @(vTop)px; left: @(vLeft)px;"
                                 @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Right))">
@@ -211,8 +211,7 @@
 
 @code {
     // Dynamic positioning constants (taken from CSS)
-    const int CELL_SIZE = 60;
-    const int CELL_GAP = 1;
+    const int CELL_SIZE = 60, CELL_GAP = 1, CELL_WITH_GAP = CELL_SIZE + CELL_GAP;
     const int GRID_PADDING = 8;
     const int BORDER_BUTTON_SIZE = 24;
 
@@ -278,27 +277,15 @@
         StateHasChanged();
     }
 
-    private int GetHorizontalBorderTop(Pos pos)
-    {
-        // Position at the bottom of the current cell
-        return GRID_PADDING + (pos.Row + 1) * (CELL_SIZE + CELL_GAP) - (BORDER_BUTTON_SIZE / 2);
-    }
+    // Position at the bottom of the current cell
+    private int GetHorizontalBorderTop(Pos pos) => GRID_PADDING + (pos.Row + 1) * CELL_WITH_GAP - (BORDER_BUTTON_SIZE / 2);
 
-    private int GetHorizontalBorderLeft(Pos pos)
-    {
-        // Position at the center of the current cell
-        return GRID_PADDING + pos.Col * (CELL_SIZE + CELL_GAP) + (CELL_SIZE / 2) - (BORDER_BUTTON_SIZE / 2);
-    }
+    // Position at the center of the current cell
+    private int GetHorizontalBorderLeft(Pos pos) => GRID_PADDING + pos.Col * CELL_WITH_GAP + (CELL_SIZE - BORDER_BUTTON_SIZE) / 2;
 
-    private int GetVerticalBorderTop(Pos pos)
-    {
-        // Position at the center of the current cell
-        return GRID_PADDING + pos.Row * (CELL_SIZE + CELL_GAP) + (CELL_SIZE / 2) - (BORDER_BUTTON_SIZE / 2);
-    }
+    // Position at the center of the current cell
+    private int GetVerticalBorderTop(Pos pos) => GRID_PADDING + pos.Row * CELL_WITH_GAP + (CELL_SIZE - BORDER_BUTTON_SIZE) / 2;
 
-    private int GetVerticalBorderLeft(Pos pos)
-    {
-        // Position at the right of the current cell
-        return GRID_PADDING + (pos.Col + 1) * (CELL_SIZE + CELL_GAP) - (BORDER_BUTTON_SIZE / 2);
-    }
+    // Position at the right of the current cell
+    private int GetVerticalBorderLeft(Pos pos) => GRID_PADDING + (pos.Col + 1) * CELL_WITH_GAP - (BORDER_BUTTON_SIZE / 2);
 }
