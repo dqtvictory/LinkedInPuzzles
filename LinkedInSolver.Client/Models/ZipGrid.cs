@@ -4,8 +4,10 @@ public class ZipGrid(int size) : Grid(size)
 {
     // Map from a position to a number. If 0, the cell is empty
     private int[,] posToNum = null!;
+
     // Map from a number to a position
     private Pos[] numToPos = null!;
+
     // Set of walls between cells, represented as pairs of positions where first is always compared less than second
     private HashSet<(Pos, Pos)> walls = null!;
 
@@ -18,10 +20,12 @@ public class ZipGrid(int size) : Grid(size)
     }
 
     // public bool GetHasRightWall(Pos pos) => _hasRightWall[pos.Row, pos.Col];
-    public bool GetHasRightWall(Pos pos) => walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Right)));
+    public bool GetHasRightWall(Pos pos) =>
+        walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Right)));
 
     // public bool GetHasBottomWall(Pos pos) => _hasBottomWall[pos.Row, pos.Col];
-    public bool GetHasBottomWall(Pos pos) => walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Down)));
+    public bool GetHasBottomWall(Pos pos) =>
+        walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Down)));
 
     public void SetCellNumber(Pos pos, int number)
     {
@@ -45,13 +49,13 @@ public class ZipGrid(int size) : Grid(size)
 
     public int GetSmallestMissingNumber()
     {
-        return Enumerable.Range(1, Size * Size)
-            .FirstOrDefault(i => numToPos[i] == Pos.Invalid, -1);
+        return Enumerable.Range(1, Size * Size).FirstOrDefault(i => numToPos[i] == Pos.Invalid, -1);
     }
 
     public int GetMaxNumber()
     {
-        return Enumerable.Range(1, Size * Size)
+        return Enumerable
+            .Range(1, Size * Size)
             .Reverse()
             .FirstOrDefault(i => numToPos[i] != Pos.Invalid, -1);
     }

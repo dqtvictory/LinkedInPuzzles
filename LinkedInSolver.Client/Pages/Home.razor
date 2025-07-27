@@ -8,14 +8,16 @@
     <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true" Class="mb-8">
         LinkedIn Puzzles Solver
     </MudText>
-    
+
     <MudGrid Justify="Justify.Center" Spacing="4">
         @foreach (var puzzle in Puzzle.ALL_PUZZLES)
         {
             <MudItem xs="12" sm="6" md="4">
-                <MudCard Class="puzzle-card" Style="cursor: pointer; height: 200px;" @onclick="() => Navigation.NavigateTo(puzzle.Route)">
+                <MudCard Class="puzzle-card" Style="cursor: pointer; height: 200px;"
+                    @onclick="() => Navigation.NavigateTo(puzzle.Route)">
                     <MudCardContent Class="d-flex flex-column align-center justify-center pa-6">
-                        <img src="@puzzle.Icon" alt="@puzzle.Name" style="width: 64px; height: 64px; margin-bottom: 16px;" />
+                        <img src="@puzzle.Icon" alt="@puzzle.Name"
+                            style="width: 64px; height: 64px; margin-bottom: 16px;" />
                         <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">
                             @puzzle.Name
                         </MudText>

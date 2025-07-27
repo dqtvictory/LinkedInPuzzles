@@ -2,7 +2,9 @@ namespace LinkedInSolver.Client.Models;
 
 public abstract class Grid
 {
-    public const int DEFAULT_SIZE = 8, MIN_SIZE = 4, MAX_SIZE = 16;
+    public const int DEFAULT_SIZE = 8,
+        MIN_SIZE = 4,
+        MAX_SIZE = 16;
 
     public int Size { get; set; } = DEFAULT_SIZE;
 

@@ -2,22 +2,19 @@
 @using LinkedInSolver.Client.Models
 @using LinkedInSolver.Client.Components
 
-<PuzzleGrid
-    CurrentPuzzle="puzzle"
-    CurrentGrid="grid"
-    GetCellClassesForDiv="getCellClasses"
+<PuzzleGrid CurrentPuzzle="puzzle" CurrentGrid="grid" GetCellClassesForDiv="getCellClasses"
     GetCellContent="getCellContent" />
 
 @code {
     private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Zip");
-    
+
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     private ZipGrid grid = new(Grid.DEFAULT_SIZE);
 
     private List<string> getCellClasses(Pos pos)
     {
         var classes = new List<string>();
-        
+
         if (grid.GetHasRightWall(pos))
         {
             classes.Add("right-wall");
@@ -32,7 +29,7 @@
         {
             classes.Add("left-wall");
         }
-        
+
         if (pos.Row > 0 && grid.GetHasBottomWall(pos.GetNeighbor(Pos.Direction.Up)))
         {
             classes.Add("top-wall");
@@ -41,7 +38,8 @@
         return classes;
     }
 
-    private RenderFragment? getCellContent(Pos pos) {
+    private RenderFragment? getCellContent(Pos pos)
+    {
         if (!grid.HasNumber(pos)) return null;
 
         var cellNumber = grid.GetCellNumber(pos);

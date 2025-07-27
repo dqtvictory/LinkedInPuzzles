@@ -2,20 +2,17 @@
 @using LinkedInSolver.Client.Models
 @using LinkedInSolver.Client.Components
 
-<PuzzleGrid
-    CurrentPuzzle="puzzle"
-    CurrentGrid="grid"
-    GetCellClassesForDiv="getCellClasses"
+<PuzzleGrid CurrentPuzzle="puzzle" CurrentGrid="grid" GetCellClassesForDiv="getCellClasses"
     GetCellContent="getCellContent" />
 
 @code {
     private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Tango");
-    
+
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     private TangoGrid grid = new(Grid.DEFAULT_SIZE);
 
     private List<string> getCellClasses(Pos pos) =>
-        grid.GetIsActive(pos) ? new() { "active" } : new();
+    grid.GetIsActive(pos) ? new() { "active" } : new();
 
     private RenderFragment? getCellContent(Pos pos) => null;
 }

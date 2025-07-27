@@ -6,12 +6,12 @@
         justify-content: center;
         margin-top: 24px;
     }
-    
+
     .puzzle-grid-wrapper {
         position: relative;
         width: fit-content;
     }
-    
+
     .puzzle-grid {
         display: grid;
         gap: 1px;
@@ -22,7 +22,7 @@
         width: fit-content;
         aspect-ratio: 1;
     }
-    
+
     .grid-cell {
         background-color: white;
         border: 1px solid #e9ecef;
@@ -38,34 +38,34 @@
         justify-content: center;
         position: relative;
     }
-    
+
     .grid-cell.right-wall {
         border-right: 2px solid #000 !important;
     }
-    
+
     .grid-cell.bottom-wall {
         border-bottom: 2px solid #000 !important;
     }
-    
+
     .grid-cell.left-wall {
         border-left: 2px solid #000 !important;
     }
-    
+
     .grid-cell.top-wall {
         border-top: 2px solid #000 !important;
     }
-    
+
     .cell-number {
         font-size: 20px;
         font-weight: bold;
         color: #333;
         user-select: none;
     }
-    
+
     .cell-number.first-last {
         color: #dc3545 !important;
     }
-    
+
     .border-button {
         position: absolute;
         width: 24px;
@@ -81,19 +81,19 @@
         transition: opacity 0.2s ease;
         z-index: 10;
     }
-    
+
     .border-button:hover {
         opacity: 1 !important;
         background-color: #7FDD7F;
     }
-    
+
     .plus-icon {
         color: #A9A9A9;
         font-size: 16px;
         font-weight: bold;
         line-height: 1;
     }
-    
+
     .debug-message {
         margin-top: 16px;
         padding: 8px;
@@ -103,17 +103,17 @@
         font-family: monospace;
         text-align: center;
     }
-    
+
     .grid-cell:hover {
         background-color: #f8f9fa;
         transform: scale(0.95);
     }
-    
+
     .grid-cell.active {
         background-color: #dc3545;
         border-color: #b02a37;
     }
-    
+
     .grid-cell.active:hover {
         background-color: #c82333;
     }
@@ -126,7 +126,8 @@
     <MudBreadcrumbs Items="breadcrumbItems" Class="mb-4" />
 
     <div class="d-flex align-center mb-4">
-        <img src="@CurrentPuzzle.Icon" alt="@CurrentPuzzle.Name" style="width: 48px; height: 48px; margin-right: 16px;" />
+        <img src="@CurrentPuzzle.Icon" alt="@CurrentPuzzle.Name"
+            style="width: 48px; height: 48px; margin-right: 16px;" />
         <MudText Typo="Typo.h4" GutterBottom="false">
             @CurrentPuzzle.Name
         </MudText>
@@ -134,17 +135,9 @@
 
     <div class="d-flex justify-center mb-4">
         <div class="d-flex align-center">
-            <MudTextField @bind-Value="gridSizeInput" 
-                        Label="Grid Size" 
-                        Variant="Variant.Outlined" 
-                        Margin="Margin.Dense"
-                        Style="width: 120px; margin-right: 16px;"
-                        Error="@showError"
-                        ErrorText="@errorMessage"
-                        T="int" />
-            <MudButton Variant="Variant.Filled" 
-                    Color="Color.Primary" 
-                    @onclick="OnResizeGrid">
+            <MudTextField @bind-Value="gridSizeInput" Label="Grid Size" Variant="Variant.Outlined" Margin="Margin.Dense"
+                Style="width: 120px; margin-right: 16px;" Error="@showError" ErrorText="@errorMessage" T="int" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OnResizeGrid">
                 New Grid
             </MudButton>
         </div>
@@ -152,19 +145,19 @@
 
     <div class="grid-container">
         <div class="puzzle-grid-wrapper">
-            <div class="puzzle-grid" style="grid-template-columns: repeat(@CurrentGrid.Size, 1fr); grid-template-rows: repeat(@CurrentGrid.Size, 1fr);">
+            <div class="puzzle-grid"
+                style="grid-template-columns: repeat(@CurrentGrid.Size, 1fr); grid-template-rows: repeat(@CurrentGrid.Size, 1fr);">
                 @for (int i = 0; i < CurrentGrid.Size * CurrentGrid.Size; i++)
                 {
                     int row = i / CurrentGrid.Size;
-                    int col = i % CurrentGrid.Size; 
+                    int col = i % CurrentGrid.Size;
                     Pos pos = new(row, col);
-                    
+
                     List<string> borderClasses = GetCellClassesForDiv(pos);
                     string cellClasses = $"grid-cell {string.Join(" ", borderClasses)}";
 
                     <!-- cell contents -->
-                    <div class="@cellClasses"
-                        @onclick="() => OnCellClick(pos)">
+                    <div class="@cellClasses" @onclick="() => OnCellClick(pos)">
                         @GetCellContent(pos)
                     </div>
 
@@ -176,20 +169,18 @@
                         {
                             int hTop = GetHorizontalBorderTop(pos);
                             int hLeft = GetHorizontalBorderLeft(pos);
-                            <div class="border-button horizontal" 
-                                style="top: @(hTop)px; left: @(hLeft)px;"
+                            <div class="border-button horizontal" style="top: @(hTop)px; left: @(hLeft)px;"
                                 @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Down))">
                                 <span class="plus-icon">+</span>
                             </div>
                         }
-                        
+
                         // Vertical border button (right of current cell)
                         if (col < CurrentGrid.Size - 1)
                         {
                             int vTop = GetVerticalBorderTop(pos);
                             int vLeft = GetVerticalBorderLeft(pos);
-                            <div class="border-button vertical" 
-                                style="top: @(vTop)px; left: @(vLeft)px;"
+                            <div class="border-button vertical" style="top: @(vTop)px; left: @(vLeft)px;"
                                 @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Right))">
                                 <span class="plus-icon">+</span>
                             </div>
@@ -238,7 +229,7 @@
     }
 
     private void OnResizeGrid()
-    {   
+    {
         if (gridSizeInput < Grid.MIN_SIZE || gridSizeInput > Grid.MAX_SIZE)
         {
             showError = true;
@@ -281,10 +272,12 @@
     private int GetHorizontalBorderTop(Pos pos) => GRID_PADDING + (pos.Row + 1) * CELL_WITH_GAP - (BORDER_BUTTON_SIZE / 2);
 
     // Position at the center of the current cell
-    private int GetHorizontalBorderLeft(Pos pos) => GRID_PADDING + pos.Col * CELL_WITH_GAP + (CELL_SIZE - BORDER_BUTTON_SIZE) / 2;
+    private int GetHorizontalBorderLeft(Pos pos) => GRID_PADDING + pos.Col * CELL_WITH_GAP + (CELL_SIZE -
+    BORDER_BUTTON_SIZE) / 2;
 
     // Position at the center of the current cell
-    private int GetVerticalBorderTop(Pos pos) => GRID_PADDING + pos.Row * CELL_WITH_GAP + (CELL_SIZE - BORDER_BUTTON_SIZE) / 2;
+    private int GetVerticalBorderTop(Pos pos) => GRID_PADDING + pos.Row * CELL_WITH_GAP + (CELL_SIZE - BORDER_BUTTON_SIZE) /
+    2;
 
     // Position at the right of the current cell
     private int GetVerticalBorderLeft(Pos pos) => GRID_PADDING + (pos.Col + 1) * CELL_WITH_GAP - (BORDER_BUTTON_SIZE / 2);
