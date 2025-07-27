@@ -1,67 +1,64 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="false" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
-    <MudMainContent Class="pa-4"
-        Style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh;">
-        @Body
-    </MudMainContent>
+  <MudMainContent Class="pa-4"
+                  Style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh;">
+    @Body
+  </MudMainContent>
 </MudLayout>
 
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+  An unhandled error has occurred.
+  <a href="." class="reload">Reload</a>
+  <span class="dismiss">🗙</span>
 </div>
 
 @code {
-    private MudTheme? _theme = null;
+  private MudTheme? _theme = null;
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
+  protected override void OnInitialized() {
+    base.OnInitialized();
 
-        _theme = new()
-        {
-            PaletteLight = _lightPalette,
-            LayoutProperties = new LayoutProperties()
-        };
-    }
-
-    private readonly PaletteLight _lightPalette = new()
-    {
-        Black = "#2c2c2c",
-        Background = "#f8f9fa",
-        Surface = "#ffffff",
-        AppbarText = "#495057",
-        AppbarBackground = "rgba(248,249,250,0.95)",
-        DrawerBackground = "#f8f9fa",
-        GrayLight = "#e9ecef",
-        GrayLighter = "#f8f9fa",
-        Primary = "#4f46e5",
-        Secondary = "#6c757d",
-        Tertiary = "#20c997",
-        Info = "#0dcaf0",
-        Success = "#198754",
-        Warning = "#ffc107",
-        Error = "#dc3545",
-        Dark = "#212529",
-        TextPrimary = "#212529",
-        TextSecondary = "#6c757d",
-        TextDisabled = "#adb5bd",
-        ActionDefault = "#6c757d",
-        ActionDisabled = "#adb5bd",
-        ActionDisabledBackground = "#e9ecef",
-        Divider = "#dee2e6",
-        DividerLight = "#f8f9fa",
-        TableLines = "#dee2e6",
-        LinesDefault = "#dee2e6",
-        LinesInputs = "#ced4da",
-        HoverOpacity = 0.06,
-        RippleOpacity = 0.1,
+    _theme = new() {
+      PaletteLight = _lightPalette,
+      LayoutProperties = new LayoutProperties()
     };
+  }
+
+  private readonly PaletteLight _lightPalette = new() {
+    Black = "#2c2c2c",
+    Background = "#f8f9fa",
+    Surface = "#ffffff",
+    AppbarText = "#495057",
+    AppbarBackground = "rgba(248,249,250,0.95)",
+    DrawerBackground = "#f8f9fa",
+    GrayLight = "#e9ecef",
+    GrayLighter = "#f8f9fa",
+    Primary = "#4f46e5",
+    Secondary = "#6c757d",
+    Tertiary = "#20c997",
+    Info = "#0dcaf0",
+    Success = "#198754",
+    Warning = "#ffc107",
+    Error = "#dc3545",
+    Dark = "#212529",
+    TextPrimary = "#212529",
+    TextSecondary = "#6c757d",
+    TextDisabled = "#adb5bd",
+    ActionDefault = "#6c757d",
+    ActionDisabled = "#adb5bd",
+    ActionDisabledBackground = "#e9ecef",
+    Divider = "#dee2e6",
+    DividerLight = "#f8f9fa",
+    TableLines = "#dee2e6",
+    LinesDefault = "#dee2e6",
+    LinesInputs = "#ced4da",
+    HoverOpacity = 0.06,
+    RippleOpacity = 0.1,
+  };
 }

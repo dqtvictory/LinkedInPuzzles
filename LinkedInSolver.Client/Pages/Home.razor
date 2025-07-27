@@ -1,36 +1,35 @@
-﻿@page "/"
+@page "/"
 @using LinkedInSolver.Client.Models
 @using MudBlazor
 
 <PageTitle>LinkedIn Puzzles Solver</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
-    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true" Class="mb-8">
-        LinkedIn Puzzles Solver
-    </MudText>
+  <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true" Class="mb-8">
+    LinkedIn Puzzles Solver
+  </MudText>
 
-    <MudGrid Justify="Justify.Center" Spacing="4">
-        @foreach (var puzzle in Puzzle.ALL_PUZZLES)
-        {
-            <MudItem xs="12" sm="6" md="4">
-                <MudCard Class="puzzle-card" Style="cursor: pointer; height: 200px;"
-                    @onclick="() => Navigation.NavigateTo(puzzle.Route)">
-                    <MudCardContent Class="d-flex flex-column align-center justify-center pa-6">
-                        <img src="@puzzle.Icon" alt="@puzzle.Name"
-                            style="width: 64px; height: 64px; margin-bottom: 16px;" />
-                        <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">
-                            @puzzle.Name
-                        </MudText>
-                        <MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Secondary">
-                            @puzzle.Description
-                        </MudText>
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-        }
-    </MudGrid>
+  <MudGrid Justify="Justify.Center" Spacing="4">
+    @foreach (var puzzle in Puzzle.ALL_PUZZLES) {
+      <MudItem xs="12" sm="6" md="4">
+        <MudCard Class="puzzle-card" Style="cursor: pointer; height: 200px;"
+                 @onclick="() => Navigation.NavigateTo(puzzle.Route)">
+          <MudCardContent Class="d-flex flex-column align-center justify-center pa-6">
+            <img src="@puzzle.Icon" alt="@puzzle.Name"
+                 style="width: 64px; height: 64px; margin-bottom: 16px;" />
+            <MudText Typo="Typo.h5" Align="Align.Center" GutterBottom="true">
+              @puzzle.Name
+            </MudText>
+            <MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Secondary">
+              @puzzle.Description
+            </MudText>
+          </MudCardContent>
+        </MudCard>
+      </MudItem>
+    }
+  </MudGrid>
 </MudContainer>
 
 @code {
-    [Inject] private NavigationManager Navigation { get; set; } = default!;
+  [Inject] private NavigationManager Navigation { get; set; } = default!;
 }

@@ -3,48 +3,42 @@
 @using LinkedInSolver.Client.Components
 
 <PuzzleGrid CurrentPuzzle="puzzle" CurrentGrid="grid" GetCellClassesForDiv="getCellClasses"
-    GetCellContent="getCellContent" />
+            GetCellContent="getCellContent" />
 
 @code {
-    private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Zip");
+  private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Zip");
 
-    [Inject] private NavigationManager Navigation { get; set; } = default!;
-    private ZipGrid grid = new(Grid.DEFAULT_SIZE);
+  [Inject] private NavigationManager Navigation { get; set; } = default!;
+  private ZipGrid grid = new(Grid.DEFAULT_SIZE);
 
-    private List<string> getCellClasses(Pos pos)
-    {
-        var classes = new List<string>();
+  private List<string> getCellClasses(Pos pos) {
+    var classes = new List<string>();
 
-        if (grid.GetHasRightWall(pos))
-        {
-            classes.Add("right-wall");
-        }
-
-        if (grid.GetHasBottomWall(pos))
-        {
-            classes.Add("bottom-wall");
-        }
-
-        if (pos.Col > 0 && grid.GetHasRightWall(pos.GetNeighbor(Pos.Direction.Left)))
-        {
-            classes.Add("left-wall");
-        }
-
-        if (pos.Row > 0 && grid.GetHasBottomWall(pos.GetNeighbor(Pos.Direction.Up)))
-        {
-            classes.Add("top-wall");
-        }
-
-        return classes;
+    if (grid.GetHasRightWall(pos)) {
+      classes.Add("right-wall");
     }
 
-    private RenderFragment? getCellContent(Pos pos)
-    {
-        if (!grid.HasNumber(pos)) return null;
-
-        var cellNumber = grid.GetCellNumber(pos);
-        var maxNumber = grid.GetMaxNumber();
-        var isFirstOrLast = cellNumber == 1 || cellNumber == maxNumber;
-        return @<span class="cell-number @(isFirstOrLast ? "first-last" : "")">@cellNumber</span>;
+    if (grid.GetHasBottomWall(pos)) {
+      classes.Add("bottom-wall");
     }
+
+    if (pos.Col > 0 && grid.GetHasRightWall(pos.GetNeighbor(Pos.Direction.Left))) {
+      classes.Add("left-wall");
+    }
+
+    if (pos.Row > 0 && grid.GetHasBottomWall(pos.GetNeighbor(Pos.Direction.Up))) {
+      classes.Add("top-wall");
+    }
+
+    return classes;
+  }
+
+  private RenderFragment? getCellContent(Pos pos) {
+    if (!grid.HasNumber(pos)) return null;
+
+    var cellNumber = grid.GetCellNumber(pos);
+    var maxNumber = grid.GetMaxNumber();
+    var isFirstOrLast = cellNumber == 1 || cellNumber == maxNumber;
+    return @<span class="cell-number @(isFirstOrLast ? "first-last" : "")">@cellNumber</span>;
+  }
 }
