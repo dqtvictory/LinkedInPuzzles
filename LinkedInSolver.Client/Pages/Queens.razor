@@ -1,18 +1,24 @@
 @page "/queens"
-@using LinkedInSolver.Client.Models
 @using LinkedInSolver.Client.Components
+@using LinkedInSolver.Client.Models
 
 <PuzzleGrid CurrentPuzzle="puzzle" CurrentGrid="grid" GetCellClassesForDiv="getCellClasses"
-            GetCellContent="getCellContent" />
+            GetCellContent="getCellContent"/>
 
 @code {
-  private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Queens");
+    private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Queens");
 
-  [Inject] private NavigationManager Navigation { get; set; } = default!;
-  private QueensGrid grid = new(Grid.DEFAULT_SIZE);
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+    private readonly QueensGrid grid = new(Grid.DefaultSize);
 
-  private List<string> getCellClasses(Pos pos) =>
-  grid.GetIsActive(pos) ? new() { "active" } : new();
+    private List<string> getCellClasses(Pos pos)
+    {
+        return grid.GetIsActive(pos) ? new List<string> { "active" } : new List<string>();
+    }
 
-  private RenderFragment? getCellContent(Pos pos) => null;
+    private RenderFragment? getCellContent(Pos pos)
+    {
+        return null;
+    }
+
 }

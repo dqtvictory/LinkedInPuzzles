@@ -2,25 +2,32 @@ using LinkedInSolver.Client.Models.Solver;
 
 namespace LinkedInSolver.Client.Models;
 
-public class QueensGrid(int size) : Grid(size) {
-  private bool[,] isActive = null!;
+public class QueensGrid(int size) : Grid(size)
+{
+    private bool[,] _isActive = null!;
 
-  protected override void ResetState() {
-    solver = new QueensSolver(this);
-    isActive = new bool[Size, Size];
-  }
+    public override bool HasBorderActions => false;
 
-  public bool GetIsActive(Pos pos) => isActive[pos.Row, pos.Col];
+    protected override void ResetState()
+    {
+        Solver = new QueensSolver(this);
+        _isActive = new bool[Size, Size];
+    }
 
-  public override void OnCellClick(Pos pos) {
-    // Queens puzzle logic: toggle cell activation
-    isActive[pos.Row, pos.Col] = !isActive[pos.Row, pos.Col];
-  }
+    public bool GetIsActive(Pos pos)
+    {
+        return _isActive[pos.Row, pos.Col];
+    }
 
-  public override void OnBorderClick(Pos pos1, Pos pos2) {
-    // Queens: no border interactions
-    // (border actions are disabled for Queens)
-  }
+    public override void OnCellClick(Pos pos)
+    {
+        // Queens puzzle logic: toggle cell activation
+        _isActive[pos.Row, pos.Col] = !_isActive[pos.Row, pos.Col];
+    }
 
-  public override bool HasBorderActions => false;
+    public override void OnBorderClick(Pos pos1, Pos pos2)
+    {
+        // Queens: no border interactions
+        // (border actions are disabled for Queens)
+    }
 }
