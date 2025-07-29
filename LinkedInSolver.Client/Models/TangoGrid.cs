@@ -4,27 +4,60 @@ namespace LinkedInSolver.Client.Models;
 
 public class TangoGrid(int size) : Grid(size)
 {
-    private bool[,] _isActive = null!;
+    /// <summary>
+    ///     Type of a border between two cells
+    /// </summary>
+    public enum BorderType
+    {
+        None,
+        Equal,
+        Opposite
+    }
+
+    /// <summary>
+    ///     Type of a cell
+    /// </summary>
+    public enum CellType
+    {
+        Empty,
+        Sun,
+        Moon
+    }
+
+    private Dictionary<(Pos, Pos), BorderType> _borders = null!;
+
+    private CellType[,] _cells = null!;
 
     protected override void ResetState()
     {
         Solver = new TangoSolver(this);
-        _isActive = new bool[Size, Size];
+
+        _cells = new CellType[Size, Size];
+        // Assign every cell to type EMPTY initially
+        for (var row = 0; row < Size; row++)
+        for (var col = 0; col < Size; col++)
+            _cells[row, col] = CellType.Empty;
+
+        _borders = new Dictionary<(Pos, Pos), BorderType>();
     }
 
-    public bool GetIsActive(Pos pos)
+    public CellType GetCellType(Pos pos)
     {
-        return _isActive[pos.Row, pos.Col];
+        return _cells[pos.Row, pos.Col];
     }
 
-    public void OnCellClick(Pos pos)
+    public void SetCellType(Pos pos, CellType cellType)
     {
-        _isActive[pos.Row, pos.Col] = !_isActive[pos.Row, pos.Col];
+        _cells[pos.Row, pos.Col] = cellType;
     }
 
-    public void OnBorderClick(Pos pos1, Pos pos2)
+    public BorderType GetBorderType(Pos pos1, Pos pos2)
     {
-        // Tango puzzle: border logic (to be implemented)
-        // For now, just a placeholder
+        return _borders.GetValueOrDefault(Pos.GetSortedPair(pos1, pos2), BorderType.None);
+    }
+
+    public void SetBorderType(Pos pos1, Pos pos2, BorderType borderType)
+    {
+        _borders[Pos.GetSortedPair(pos1, pos2)] = borderType;
     }
 }

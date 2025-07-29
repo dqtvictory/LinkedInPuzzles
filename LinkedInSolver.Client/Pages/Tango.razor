@@ -2,7 +2,15 @@
 @using LinkedInSolver.Client.Components
 @using LinkedInSolver.Client.Models
 
-<PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid" PageGetCellClasses="GetCellClasses"
+<style>
+    .input-cell {
+        text-align: center;
+        font-size: 32px;
+    }
+</style>
+
+<PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid"
+            PageGetCellBgColor="GetCellBgColor" PageGetCellContent="GetCellContent"
             PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick"/>
 
 @code {
@@ -10,19 +18,44 @@
 
     private readonly TangoGrid _grid = new(Grid.DefaultSize);
 
-    private List<string> GetCellClasses(Pos pos)
+    private string GetCellBgColor(Pos pos)
     {
-        return _grid.GetIsActive(pos) ? ["active"] : [];
+        return _grid.GetCellType(pos) == TangoGrid.CellType.Empty ? "#FFFFFF" : "#EEEEEE";
+    }
+
+    private RenderFragment? GetCellContent(Pos pos)
+    {
+        return _grid.GetCellType(pos) switch
+        {
+            TangoGrid.CellType.Empty => null,
+            TangoGrid.CellType.Sun => @<span class="input-cell">🔆</span>,
+            TangoGrid.CellType.Moon => @<span class="input-cell">⏾</span>,
+            _ => throw new InvalidOperationException("Unexpected cell type")
+        };
     }
 
     private void OnCellClick(Pos pos)
     {
-        _grid.OnCellClick(pos);
+        var nextCellType = _grid.GetCellType(pos) switch
+        {
+            TangoGrid.CellType.Empty => TangoGrid.CellType.Sun,
+            TangoGrid.CellType.Sun => TangoGrid.CellType.Moon,
+            TangoGrid.CellType.Moon => TangoGrid.CellType.Empty,
+            _ => throw new InvalidOperationException("Unexpected cell type")
+        };
+        _grid.SetCellType(pos, nextCellType);
     }
 
     private void OnBorderClick(Pos pos1, Pos pos2)
     {
-        _grid.OnBorderClick(pos1, pos2);
+        var nextBorderType = _grid.GetBorderType(pos1, pos2) switch
+        {
+            TangoGrid.BorderType.None => TangoGrid.BorderType.Equal,
+            TangoGrid.BorderType.Equal => TangoGrid.BorderType.Opposite,
+            TangoGrid.BorderType.Opposite => TangoGrid.BorderType.None,
+            _ => throw new InvalidOperationException("Unexpected border type")
+        };
+        _grid.SetBorderType(pos1, pos2, nextBorderType);
     }
 
 }

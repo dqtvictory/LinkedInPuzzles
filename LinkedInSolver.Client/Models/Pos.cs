@@ -55,6 +55,15 @@ public readonly record struct Pos(int Row, int Col)
     }
 
     /// <summary>
+    ///     Return sorted pair of positions
+    /// </summary>
+    /// <returns>(pos1, pos2) if pos1 compares less than pos2, otherwise (pos2, pos1)</returns>
+    public static (Pos, Pos) GetSortedPair(Pos pos1, Pos pos2)
+    {
+        return pos1 < pos2 ? (pos1, pos2) : (pos2, pos1);
+    }
+
+    /// <summary>
     ///     Get the neighboring position to a direction
     /// </summary>
     public Pos GetNeighbor(Direction direction)
