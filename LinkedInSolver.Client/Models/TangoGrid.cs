@@ -58,6 +58,10 @@ public class TangoGrid(int size) : Grid(size)
 
     public void SetBorderType(Pos pos1, Pos pos2, BorderType borderType)
     {
-        _borders[Pos.GetSortedPair(pos1, pos2)] = borderType;
+        var posPair = Pos.GetSortedPair(pos1, pos2);
+        if (borderType == BorderType.None)
+            _borders.Remove(posPair);
+        else
+            _borders[posPair] = borderType;
     }
 }

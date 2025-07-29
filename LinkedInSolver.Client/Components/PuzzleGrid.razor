@@ -74,8 +74,8 @@
     position: absolute;
     width: 24px;
     height: 24px;
-    background-color: #90EE90;
-    border: 2px solid #90EE90;
+    background-color: #90ee90;
+    border: 2px solid #90ee90;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -88,7 +88,7 @@
 
   .border-button:hover {
     opacity: 1 !important;
-    background-color: #7FDD7F;
+    background-color: #7fdd7f;
   }
 
   .border-button.disabled {
@@ -97,8 +97,21 @@
     pointer-events: none;
   }
 
+  .border-button.permanent {
+    opacity: 1 !important;
+    background-color: #ffffff;
+    border: 2px solid #333;
+    color: #333;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  .border-button.permanent:hover {
+    background-color: #f0f0f0;
+  }
+
   .plus-icon {
-    color: #A9A9A9;
+    color: #a9a9a9;
     font-size: 16px;
     font-weight: bold;
     line-height: 1;
@@ -199,28 +212,53 @@
               continue;
             }
 
-            var borderClass = GetBorderClasses();
             // Horizontal border button (below current cell)
             if (row < CurrentGrid.Size - 1)
             {
+              var downPos = pos.GetNeighbor(Pos.Direction.Down);
+              var borderContent = PageGetBorderContent?.Invoke(pos, downPos);
+              var customBorderClasses = PageGetBorderClasses?.Invoke(pos, downPos) ?? [];
               var hTop = GetHorizontalBorderTop(pos);
               var hLeft = GetHorizontalBorderLeft(pos);
-              var finalClass = $"{borderClass} horizontal";
+
+              var borderClasses = GetBorderClasses(pos, downPos, customBorderClasses);
+              var finalClass = $"{borderClasses} horizontal";
+
               <div class="@finalClass" style="top: @(hTop)px; left: @(hLeft)px;"
-                   @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Down))">
-                <span class="plus-icon">+</span>
+                   @onclick="() => OnBorderClick(pos, downPos)">
+                @if (borderContent != null)
+                {
+                  <span>@borderContent</span>
+                }
+                else
+                {
+                  <span class="plus-icon">+</span>
+                }
               </div>
             }
 
             // Vertical border button (right of current cell)
             if (col < CurrentGrid.Size - 1)
             {
+              var rightPos = pos.GetNeighbor(Pos.Direction.Right);
+              var borderContent = PageGetBorderContent?.Invoke(pos, rightPos);
+              var customBorderClasses = PageGetBorderClasses?.Invoke(pos, rightPos) ?? [];
               var vTop = GetVerticalBorderTop(pos);
               var vLeft = GetVerticalBorderLeft(pos);
-              var finalClass = $"{borderClass} vertical";
+
+              var borderClasses = GetBorderClasses(pos, rightPos, customBorderClasses);
+              var finalClass = $"{borderClasses} vertical";
+
               <div class="@finalClass" style="top: @(vTop)px; left: @(vLeft)px;"
-                   @onclick="() => OnBorderClick(pos, pos.GetNeighbor(Pos.Direction.Right))">
-                <span class="plus-icon">+</span>
+                   @onclick="() => OnBorderClick(pos, rightPos)">
+                @if (borderContent != null)
+                {
+                  <span>@borderContent</span>
+                }
+                else
+                {
+                  <span class="plus-icon">+</span>
+                }
               </div>
             }
           }
@@ -283,6 +321,18 @@
   /// </summary>
   [Parameter]
   public Action<Pos> PageOnCellClick { get; set; } = null!;
+
+  /// <summary>
+  ///     Get border content for display (e.g., "=", "×", or null for hover)
+  /// </summary>
+  [Parameter]
+  public Func<Pos, Pos, string?>? PageGetBorderContent { get; set; }
+
+  /// <summary>
+  ///     Get border CSS classes
+  /// </summary>
+  [Parameter]
+  public Func<Pos, Pos, List<string>>? PageGetBorderClasses { get; set; }
 
   /// <summary>
   ///     UI input for grid size for resizing the grid
@@ -391,33 +441,34 @@
     return string.Join(" ", classes);
   }
 
-  private string GetBorderClasses()
+  private string GetBorderClasses(Pos pos1, Pos pos2, List<string> customClasses)
   {
-    return _solverRunning ? "border-button disabled" : "border-button";
+    var baseClass = _solverRunning ? "border-button disabled" : "border-button";
+    return string.Join(" ", customClasses.Prepend(baseClass));
   }
 
   // Position at the bottom of the current cell
   private static int GetHorizontalBorderTop(Pos pos)
   {
-    return GridPadding + (pos.Row + 1) * CellSizeWithGap - BorderButtonSize / 2;
+    return GridPadding + (pos.Row + 1) * CellSizeWithGap - BorderButtonSize / 2 + 2;
   }
 
   // Position at the center of the current cell
   private static int GetHorizontalBorderLeft(Pos pos)
   {
-    return GridPadding + pos.Col * CellSizeWithGap + (CellSize - BorderButtonSize) / 2;
+    return GridPadding + pos.Col * CellSizeWithGap + (CellSize - BorderButtonSize) / 2 + 2;
   }
 
   // Position at the center of the current cell
   private static int GetVerticalBorderTop(Pos pos)
   {
-    return GridPadding + pos.Row * CellSizeWithGap + (CellSize - BorderButtonSize) / 2;
+    return GridPadding + pos.Row * CellSizeWithGap + (CellSize - BorderButtonSize) / 2 + 2;
   }
 
   // Position at the right of the current cell
   private static int GetVerticalBorderLeft(Pos pos)
   {
-    return GridPadding + (pos.Col + 1) * CellSizeWithGap - BorderButtonSize / 2;
+    return GridPadding + (pos.Col + 1) * CellSizeWithGap - BorderButtonSize / 2 + 2;
   }
 
   private async Task ValidateAndSolve()

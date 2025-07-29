@@ -5,13 +5,14 @@
 <style>
     .input-cell {
         text-align: center;
-        font-size: 32px;
+        font-size: 24px;
     }
 </style>
 
 <PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid"
             PageGetCellBgColor="GetCellBgColor" PageGetCellContent="GetCellContent"
-            PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick"/>
+            PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick"
+            PageGetBorderContent="GetBorderContent" PageGetBorderClasses="GetBorderClasses"/>
 
 @code {
     private static readonly Puzzle Puzzle = Puzzle.GetPuzzle("Tango");
@@ -56,6 +57,23 @@
             _ => throw new InvalidOperationException("Unexpected border type")
         };
         _grid.SetBorderType(pos1, pos2, nextBorderType);
+    }
+
+    private string? GetBorderContent(Pos pos1, Pos pos2)
+    {
+        return _grid.GetBorderType(pos1, pos2) switch
+        {
+            TangoGrid.BorderType.None => null, // Show hover "+" icon
+            TangoGrid.BorderType.Equal => "=", // Show permanent equal sign
+            TangoGrid.BorderType.Opposite => "×", // Show permanent x character
+            _ => throw new InvalidOperationException("Unexpected border type")
+        };
+    }
+
+    private List<string> GetBorderClasses(Pos pos1, Pos pos2)
+    {
+        var borderType = _grid.GetBorderType(pos1, pos2);
+        return borderType != TangoGrid.BorderType.None ? ["permanent"] : [];
     }
 
 }
