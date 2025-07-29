@@ -7,6 +7,19 @@
         text-align: center;
         font-size: 24px;
     }
+
+    .border-button.permanent {
+        opacity: 1 !important;
+        background-color: #ffffff;
+        border: 2px solid #333;
+        color: #333;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .border-button.permanent:hover {
+        background-color: #f0f0f0;
+    }
 </style>
 
 <PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid"
@@ -17,6 +30,9 @@
 @code {
     private static readonly Puzzle Puzzle = Puzzle.GetPuzzle("Tango");
 
+    /// <summary>
+    ///     The grid for the Tango puzzle
+    /// </summary>
     private readonly TangoGrid _grid = new(Grid.DefaultSize);
 
     private string GetCellBgColor(Pos pos)

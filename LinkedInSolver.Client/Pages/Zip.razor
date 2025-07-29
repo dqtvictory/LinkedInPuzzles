@@ -2,34 +2,66 @@
 @using LinkedInSolver.Client.Components
 @using LinkedInSolver.Client.Models
 
+<style>
+  .grid-cell.right-wall {
+    border-right: 2px solid #000 !important;
+  }
+
+  .grid-cell.bottom-wall {
+    border-bottom: 2px solid #000 !important;
+  }
+
+  .grid-cell.left-wall {
+    border-left: 2px solid #000 !important;
+  }
+
+  .grid-cell.top-wall {
+    border-top: 2px solid #000 !important;
+  }
+
+  .cell-number {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    user-select: none;
+  }
+
+  .cell-number.first-last {
+    color: #dc3545 !important;
+  }
+</style>
+
 <PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid" PageGetCellClasses="GetCellClasses"
             PageGetCellContent="GetCellContent" PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick"/>
 
 @code {
   private static readonly Puzzle Puzzle = Puzzle.GetPuzzle("Zip");
 
+  /// <summary>
+  ///     The grid for the Zip puzzle
+  /// </summary>
   private readonly ZipGrid _grid = new(Grid.DefaultSize);
 
   private List<string> GetCellClasses(Pos pos)
   {
     var classes = new List<string>();
 
-    if (_grid.GetHasRightWall(pos))
+    if (_grid.HasRightWall(pos))
     {
       classes.Add("right-wall");
     }
 
-    if (_grid.GetHasBottomWall(pos))
+    if (_grid.HasBottomWall(pos))
     {
       classes.Add("bottom-wall");
     }
 
-    if (pos.Col > 0 && _grid.GetHasRightWall(pos.GetNeighbor(Pos.Direction.Left)))
+    if (pos.Col > 0 && _grid.HasRightWall(pos.GetNeighbor(Pos.Direction.Left)))
     {
       classes.Add("left-wall");
     }
 
-    if (pos.Row > 0 && _grid.GetHasBottomWall(pos.GetNeighbor(Pos.Direction.Up)))
+    if (pos.Row > 0 && _grid.HasBottomWall(pos.GetNeighbor(Pos.Direction.Up)))
     {
       classes.Add("top-wall");
     }
@@ -52,12 +84,20 @@
 
   private void OnCellClick(Pos pos)
   {
-    _grid.OnCellClick(pos);
+    if (_grid.HasNumber(pos))
+    {
+      _grid.ClearCellNumber(pos);
+    }
+    else
+    {
+      var smallestNumber = _grid.GetSmallestMissingNumber();
+      _grid.SetCellNumber(pos, smallestNumber);
+    }
   }
 
   private void OnBorderClick(Pos pos1, Pos pos2)
   {
-    _grid.OnBorderClick(pos1, pos2);
+    _grid.ToggleWall(pos1, pos2);
   }
 
 }

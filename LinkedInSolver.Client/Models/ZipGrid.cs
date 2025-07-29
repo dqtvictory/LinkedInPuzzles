@@ -4,13 +4,14 @@ namespace LinkedInSolver.Client.Models;
 
 public class ZipGrid(int size) : Grid(size)
 {
-    // Map from a number to a position
+    /// Map from a number to a position
     private Pos[] _numToPos = null!;
 
-    // Map from a position to a number. If 0, the cell is empty
+    /// Map from a position to a number. If 0, the cell is empty
     private int[,] _posToNum = null!;
 
-    // Set of walls between cells, represented as pairs of positions where first is always compared less than second
+    /// Collection of walls between cells, represented as pairs of positions where first position
+    /// is always compared less than second
     private HashSet<(Pos, Pos)> _walls = null!;
 
     protected override void ResetState()
@@ -22,16 +23,34 @@ public class ZipGrid(int size) : Grid(size)
         _walls = [];
     }
 
-    public bool GetHasRightWall(Pos pos)
+    /// <summary>
+    ///     Whether there is a wall to the right of the specified cell position
+    /// </summary>
+    public bool HasRightWall(Pos pos)
     {
         return _walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Right)));
     }
 
-    public bool GetHasBottomWall(Pos pos)
+    /// <summary>
+    ///     Whether there is a wall to the bottom of the specified cell position
+    /// </summary>
+    public bool HasBottomWall(Pos pos)
     {
         return _walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Down)));
     }
 
+    /// <summary>
+    ///     Toggle a wall between two cell positions
+    /// </summary>
+    public void ToggleWall(Pos pos1, Pos pos2)
+    {
+        var wall = Pos.GetSortedPair(pos1, pos2);
+        if (!_walls.Remove(wall)) _walls.Add(wall);
+    }
+
+    /// <summary>
+    ///     Get the maximum number assigned to a cell in the grid
+    /// </summary>
     public int GetMaxNumber()
     {
         return Enumerable
@@ -40,53 +59,46 @@ public class ZipGrid(int size) : Grid(size)
             .FirstOrDefault(i => _numToPos[i] != Pos.Invalid, -1);
     }
 
-    public void OnCellClick(Pos pos)
-    {
-        // Zip puzzle logic: toggle numbers
-        if (HasNumber(pos))
-        {
-            // Remove number from cell
-            ClearCellNumber(pos);
-        }
-        else
-        {
-            // Add smallest missing number
-            var smallestNumber = GetSmallestMissingNumber();
-            SetCellNumber(pos, smallestNumber);
-        }
-    }
-
-    public void OnBorderClick(Pos pos1, Pos pos2)
-    {
-        // Zip puzzle: toggle walls between cells
-        var wall = pos1 < pos2 ? (pos1, pos2) : (pos2, pos1);
-        if (!_walls.Remove(wall)) _walls.Add(wall);
-    }
-
+    /// <summary>
+    ///     Whether the cell at the specified position has a number assigned to it
+    /// </summary>
     public bool HasNumber(Pos pos)
     {
         return GetCellNumber(pos) > 0;
     }
 
+    /// <summary>
+    ///     Get the number assigned to the cell at the specified position
+    /// </summary>
     public int GetCellNumber(Pos pos)
     {
         return _posToNum[pos.Row, pos.Col];
     }
 
-    private void SetCellNumber(Pos pos, int number)
+    /// <summary>
+    ///     Assign a number to the cell at the specified position
+    /// </summary>
+    public void SetCellNumber(Pos pos, int number)
     {
         _posToNum[pos.Row, pos.Col] = number;
         _numToPos[number] = pos;
     }
 
-    private void ClearCellNumber(Pos pos)
+    /// <summary>
+    ///     Unassign a number to the cell at the specified position
+    /// </summary>
+    public void ClearCellNumber(Pos pos)
     {
         var number = _posToNum[pos.Row, pos.Col];
         _posToNum[pos.Row, pos.Col] = 0;
         _numToPos[number] = Pos.Invalid;
     }
 
-    private int GetSmallestMissingNumber()
+    /// <summary>
+    ///     Get the smallest missing number in the grid. If all assigned numbers are consecutive
+    ///     from 1, return the next number
+    /// </summary>
+    public int GetSmallestMissingNumber()
     {
         return Enumerable
             .Range(1, Size * Size)

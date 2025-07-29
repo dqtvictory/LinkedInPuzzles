@@ -70,6 +70,10 @@
 @code {
     private static readonly Puzzle Puzzle = Puzzle.GetPuzzle("Queens");
 
+    /// <summary>
+    ///     Array of colors representing different regions. The array's length ultimately determines the number of
+    ///     regions available
+    /// </summary>
     private static readonly string[] RegionColors =
     [
         "#FFFFFF", // 0 - White
@@ -81,7 +85,14 @@
         "#AD6FF7" // 6 - Purple
     ];
 
+    /// <summary>
+    ///     The grid for the Queens puzzle
+    /// </summary>
     private readonly QueensGrid _grid = new(Grid.DefaultSize);
+
+    /// <summary>
+    ///     Currently active region index in the UI
+    /// </summary>
     private int _activeRegion;
 
     private void SetActiveRegion(int region)

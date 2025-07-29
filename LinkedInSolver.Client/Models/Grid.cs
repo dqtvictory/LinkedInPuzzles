@@ -9,7 +9,7 @@ public abstract class Grid
 {
     // Some default constants
     public const int
-        DefaultSize = 8,
+        DefaultSize = 6,
         MinSize = 4,
         MaxSize = 16;
 
