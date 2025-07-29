@@ -32,11 +32,6 @@ public abstract class Grid
     public int Size { get; private set; } = DefaultSize;
 
     /// <summary>
-    ///     Whether the grid should handle border actions
-    /// </summary>
-    public virtual bool HasBorderActions => true;
-
-    /// <summary>
     ///     Resize the grid to a new size then reset its state
     /// </summary>
     /// <param name="newSize">Grid's new size</param>
@@ -50,19 +45,6 @@ public abstract class Grid
     ///     Reset grid's state
     /// </summary>
     protected abstract void ResetState();
-
-    /// <summary>
-    ///     Handle cell click
-    /// </summary>
-    /// <param name="pos">Position of cell</param>
-    public abstract void OnCellClick(Pos pos);
-
-    /// <summary>
-    ///     Handle border click between two adjacent cells
-    /// </summary>
-    /// <param name="pos1">Position of cell 1</param>
-    /// <param name="pos2">Position of cell 2</param>
-    public abstract void OnBorderClick(Pos pos1, Pos pos2);
 
     /// <summary>
     ///     Validate the grid's current state

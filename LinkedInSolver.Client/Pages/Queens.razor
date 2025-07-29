@@ -2,23 +2,103 @@
 @using LinkedInSolver.Client.Components
 @using LinkedInSolver.Client.Models
 
-<PuzzleGrid CurrentPuzzle="puzzle" CurrentGrid="grid" GetCellClassesForDiv="getCellClasses"
-            GetCellContent="getCellContent"/>
-
-@code {
-    private static readonly Puzzle puzzle = Puzzle.GetPuzzle("Queens");
-
-    [Inject] private NavigationManager Navigation { get; set; } = default!;
-    private readonly QueensGrid grid = new(Grid.DefaultSize);
-
-    private List<string> getCellClasses(Pos pos)
-    {
-        return grid.GetIsActive(pos) ? new List<string> { "active" } : new List<string>();
+<style>
+    .region-selector {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
-    private RenderFragment? getCellContent(Pos pos)
+    .region-button {
+        width: 50px;
+        height: 50px;
+        border: 2px solid #333;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .region-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .region-button.selected {
+        border-width: 4px;
+        transform: scale(1.15);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .active-region-display {
+        text-align: center;
+        margin: 10px 0;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+    }
+</style>
+
+<PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid" PageOnCellClick="OnCellClick"
+            PageGetCellBgColor="GetCellBgColor"/>
+
+<div class="region-selector">
+    @for (var i = 0; i < RegionColors.Length; i++)
     {
-        return null;
+        var region = i;
+        var isActive = _activeRegion == region;
+        var buttonStyle = $"background-color: {RegionColors[region]}; color: black;";
+
+        <button class="region-button @(isActive ? "selected" : "")"
+                style="@buttonStyle"
+                @onclick="() => SetActiveRegion(region)">
+            @region
+        </button>
+    }
+</div>
+
+<div class="active-region-display">
+    Active region: <span style="color: @RegionColors[_activeRegion]; font-weight: bold;">@_activeRegion</span>
+</div>
+
+@code {
+    private static readonly Puzzle Puzzle = Puzzle.GetPuzzle("Queens");
+
+    private static readonly string[] RegionColors =
+    [
+        "#FFFFFF", // 0 - White
+        "#989C99", // 1 - Grey
+        "#45B7D1", // 2 - Blue
+        "#F06767", // 3 - Red
+        "#FECA57", // 4 - Yellow
+        "#FF9FF3", // 5 - Pink
+        "#AD6FF7" // 6 - Purple
+    ];
+
+    private readonly QueensGrid _grid = new(Grid.DefaultSize);
+    private int _activeRegion;
+
+    private void SetActiveRegion(int region)
+    {
+        _activeRegion = region;
+        StateHasChanged();
+    }
+
+    private void OnCellClick(Pos pos)
+    {
+        _grid.SetRegionForCell(pos, _activeRegion);
+    }
+
+    private string GetCellBgColor(Pos pos)
+    {
+        var region = _grid.GetRegionForCell(pos);
+        return RegionColors[region];
     }
 
 }

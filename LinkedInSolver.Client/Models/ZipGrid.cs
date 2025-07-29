@@ -13,8 +13,6 @@ public class ZipGrid(int size) : Grid(size)
     // Set of walls between cells, represented as pairs of positions where first is always compared less than second
     private HashSet<(Pos, Pos)> _walls = null!;
 
-    public override bool HasBorderActions => true;
-
     protected override void ResetState()
     {
         Solver = new ZipSolver(this);
@@ -42,7 +40,7 @@ public class ZipGrid(int size) : Grid(size)
             .FirstOrDefault(i => _numToPos[i] != Pos.Invalid, -1);
     }
 
-    public override void OnCellClick(Pos pos)
+    public void OnCellClick(Pos pos)
     {
         // Zip puzzle logic: toggle numbers
         if (HasNumber(pos))
@@ -58,7 +56,7 @@ public class ZipGrid(int size) : Grid(size)
         }
     }
 
-    public override void OnBorderClick(Pos pos1, Pos pos2)
+    public void OnBorderClick(Pos pos1, Pos pos2)
     {
         // Zip puzzle: toggle walls between cells
         var wall = pos1 < pos2 ? (pos1, pos2) : (pos2, pos1);

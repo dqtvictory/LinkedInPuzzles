@@ -23,7 +23,6 @@
   }
 
   .grid-cell {
-    background-color: white;
     border: 1px solid #e9ecef;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -157,7 +156,7 @@
     <div class="d-flex justify-center mb-4">
       <div class="d-flex align-center">
         <MudButton Variant="Variant.Filled" Color="Color.Success" @onclick="ValidateAndSolve"
-                   Disabled="@_solverRunning">
+                   Disabled="@_solverRunning" Style="margin: 8px">
           @if (_solverRunning)
           {
             <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true"/>
@@ -168,11 +167,12 @@
             <span>Validate and Solve</span>
           }
         </MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OnResizeGrid" Disabled="@_solverRunning">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OnResizeGrid" Disabled="@_solverRunning"
+                   Style="margin: 8px">
           Reset Grid
         </MudButton>
         <MudTextField @bind-Value="_gridSizeInput" Label="Grid Size" Variant="Variant.Outlined" Margin="Margin.Dense"
-                      Style="width: 120px; margin-right: 16px;" Error="@_showError" ErrorText="@_errorMessage" T="int"
+                      Style="width: 120px; margin-left: 8px;" Error="@_showError" ErrorText="@_errorMessage" T="int"
                       Disabled="@_solverRunning"/>
       </div>
     </div>
@@ -187,27 +187,19 @@
             var col = i % CurrentGrid.Size;
             Pos pos = new(row, col);
 
-            var borderClasses = GetCellClassesForDiv(pos);
-            if (_solverRunning)
-            {
-              borderClasses.Add("disabled");
-            }
-
-            var cellClasses = $"grid-cell {string.Join(" ", borderClasses)}";
-
             <!-- cell contents -->
-            <div class="@cellClasses" @onclick="() => OnCellClick(pos)">
-              @GetCellContent(pos)
+            <div class="@GetCellClasses(pos)" style="background-color: @GetCellBgColor(pos)"
+                 @onclick="() => OnCellClick(pos)">
+              @PageGetCellContent?.Invoke(pos)
             </div>
 
             <!-- cell borders -->
-            @if (!CurrentGrid.HasBorderActions)
+            @if (PageOnBorderClick == null)
             {
               continue;
             }
 
-            var borderClass = _solverRunning ? "border-button disabled" : "border-button";
-
+            var borderClass = GetBorderClasses();
             // Horizontal border button (below current cell)
             if (row < CurrentGrid.Size - 1)
             {
@@ -250,17 +242,76 @@
   const int GridPadding = 8;
   const int BorderButtonSize = 24;
 
-  [Parameter] public Puzzle CurrentPuzzle { get; set; } = null!;
-  [Parameter] public Grid CurrentGrid { get; set; } = null!;
-  [Parameter] public Func<Pos, List<string>> GetCellClassesForDiv { get; set; } = null!;
-  [Parameter] public Func<Pos, RenderFragment?> GetCellContent { get; set; } = null!;
+  /// <summary>
+  ///     Current puzzle
+  /// </summary>
+  [Parameter]
+  public Puzzle CurrentPuzzle { get; set; } = null!;
 
+  /// <summary>
+  ///     Grid of the current puzzle
+  /// </summary>
+  [Parameter]
+  public Grid CurrentGrid { get; set; } = null!;
+
+  /// <summary>
+  ///     Get background color for each cell
+  /// </summary>
+  [Parameter]
+  public Func<Pos, string>? PageGetCellBgColor { get; set; }
+
+  /// <summary>
+  ///     Get CSS classes for each cell's div element
+  /// </summary>
+  [Parameter]
+  public Func<Pos, List<string>>? PageGetCellClasses { get; set; }
+
+  /// <summary>
+  ///     Get content for each cell
+  /// </summary>
+  [Parameter]
+  public Func<Pos, RenderFragment>? PageGetCellContent { get; set; }
+
+  /// <summary>
+  ///     Action to be invoked when a border between two cells is clicked
+  /// </summary>
+  [Parameter]
+  public Action<Pos, Pos>? PageOnBorderClick { get; set; }
+
+  /// <summary>
+  ///     Action to be invoked when a cell is clicked
+  /// </summary>
+  [Parameter]
+  public Action<Pos> PageOnCellClick { get; set; } = null!;
+
+  /// <summary>
+  ///     UI input for grid size for resizing the grid
+  /// </summary>
   private int _gridSizeInput = Grid.DefaultSize;
+
+  /// <summary>
+  ///     Error message visibility for grid size input
+  /// </summary>
   private bool _showError;
+
+  /// <summary>
+  ///     Error message content for grid size input, when _showError is true
+  /// </summary>
   private string _errorMessage = string.Empty;
+
+  /// <summary>
+  ///     Debug message displayed at page's bottom
+  /// </summary>
   private string _debugMessage = string.Empty;
+
+  /// <summary>
+  ///     Breadcrumb items for navigation
+  /// </summary>
   private List<BreadcrumbItem> _breadcrumbItems = null!;
 
+  /// <summary>
+  ///     Whether the solver is running, which disables UI interactions
+  /// </summary>
   private bool _solverRunning;
 
   protected override void OnInitialized()
@@ -281,7 +332,7 @@
       return;
     }
 
-    if (_gridSizeInput < Grid.MinSize || _gridSizeInput > Grid.MaxSize)
+    if (_gridSizeInput is < Grid.MinSize or > Grid.MaxSize)
     {
       _showError = true;
       _errorMessage = $"Grid Size should be between {Grid.MinSize} and {Grid.MaxSize}";
@@ -308,21 +359,41 @@
       return;
     }
 
-    // Use polymorphic method - each grid type handles its own logic
-    CurrentGrid.OnCellClick(pos);
+    PageOnCellClick.Invoke(pos);
     StateHasChanged();
   }
 
   private void OnBorderClick(Pos pos1, Pos pos2)
   {
-    if (_solverRunning || !CurrentGrid.HasBorderActions)
+    if (_solverRunning)
     {
       return;
     }
 
-    CurrentGrid.OnBorderClick(pos1, pos2);
-    _debugMessage = $"{CurrentPuzzle.Name}: Border action between {pos1} and {pos2}";
+    PageOnBorderClick!.Invoke(pos1, pos2);
     StateHasChanged();
+  }
+
+  private string GetCellBgColor(Pos pos)
+  {
+    return PageGetCellBgColor?.Invoke(pos) ?? "#FFFFFF"; // Default white background
+  }
+
+  private string GetCellClasses(Pos pos)
+  {
+    var classes = PageGetCellClasses?.Invoke(pos) ?? [];
+    classes.Add("grid-cell");
+    if (_solverRunning)
+    {
+      classes.Add("disabled");
+    }
+
+    return string.Join(" ", classes);
+  }
+
+  private string GetBorderClasses()
+  {
+    return _solverRunning ? "border-button disabled" : "border-button";
   }
 
   // Position at the bottom of the current cell

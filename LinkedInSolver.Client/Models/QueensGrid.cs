@@ -4,30 +4,34 @@ namespace LinkedInSolver.Client.Models;
 
 public class QueensGrid(int size) : Grid(size)
 {
-    private bool[,] _isActive = null!;
-
-    public override bool HasBorderActions => false;
+    /// <summary>
+    ///     State array where each cell indicates which region index it belongs to
+    /// </summary>
+    private int[,] _state = null!;
 
     protected override void ResetState()
     {
         Solver = new QueensSolver(this);
-        _isActive = new bool[Size, Size];
+        _state = new int[Size, Size];
+        // Assign every cell to region 0 initially
+        for (var row = 0; row < Size; row++)
+        for (var col = 0; col < Size; col++)
+            _state[row, col] = 0;
     }
 
-    public bool GetIsActive(Pos pos)
+    /// <summary>
+    ///     Get the region index for a specific cell position
+    /// </summary>
+    public int GetRegionForCell(Pos pos)
     {
-        return _isActive[pos.Row, pos.Col];
+        return _state[pos.Row, pos.Col];
     }
 
-    public override void OnCellClick(Pos pos)
+    /// <summary>
+    ///     Set the region index for a specific cell position
+    /// </summary>
+    public void SetRegionForCell(Pos pos, int regionIndex)
     {
-        // Queens puzzle logic: toggle cell activation
-        _isActive[pos.Row, pos.Col] = !_isActive[pos.Row, pos.Col];
-    }
-
-    public override void OnBorderClick(Pos pos1, Pos pos2)
-    {
-        // Queens: no border interactions
-        // (border actions are disabled for Queens)
+        _state[pos.Row, pos.Col] = regionIndex;
     }
 }
