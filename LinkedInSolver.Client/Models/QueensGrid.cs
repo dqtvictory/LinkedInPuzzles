@@ -7,16 +7,16 @@ public class QueensGrid(int size) : Grid(size)
     /// <summary>
     ///     State array where each cell indicates which region index it belongs to
     /// </summary>
-    private int[,] _state = null!;
+    public int[,] State { get; private set; } = null!;
 
     protected override void ResetState()
     {
         Solver = new QueensSolver(this);
-        _state = new int[Size, Size];
+        State = new int[Size, Size];
         // Assign every cell to region 0 initially
         for (var row = 0; row < Size; row++)
         for (var col = 0; col < Size; col++)
-            _state[row, col] = 0;
+            State[row, col] = 0;
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class QueensGrid(int size) : Grid(size)
     /// </summary>
     public int GetRegionForCell(Pos pos)
     {
-        return _state[pos.Row, pos.Col];
+        return State[pos.Row, pos.Col];
     }
 
     /// <summary>
@@ -32,6 +32,6 @@ public class QueensGrid(int size) : Grid(size)
     /// </summary>
     public void SetRegionForCell(Pos pos, int regionIndex)
     {
-        _state[pos.Row, pos.Col] = regionIndex;
+        State[pos.Row, pos.Col] = regionIndex;
     }
 }

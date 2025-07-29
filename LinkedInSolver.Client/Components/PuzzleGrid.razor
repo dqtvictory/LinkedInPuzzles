@@ -448,7 +448,7 @@
         StateHasChanged();
 
         var solution = await Task.Run(CurrentGrid.Solve);
-        // Placeholder: display solution
+        _debugMessage = $"{string.Join(' ', solution)}";
 
         _solverRunning = false;
         StateHasChanged();

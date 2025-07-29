@@ -41,6 +41,11 @@ public abstract class Grid
         ResetState();
     }
 
+    public bool IsInBounds(Pos pos)
+    {
+        return pos.Row >= 0 && pos.Col >= 0 && pos.Row < Size && pos.Col < Size;
+    }
+
     /// <summary>
     ///     Reset grid's state
     /// </summary>

@@ -1,6 +1,6 @@
 ﻿namespace LinkedInSolver.Client.Models.Solver;
 
-public class TangoSolver(TangoGrid grid) : PuzzleSolver(grid)
+public class TangoSolver(TangoGrid puzzleGrid) : PuzzleSolver(puzzleGrid)
 {
     public override List<Pos> Solve()
     {

@@ -5,22 +5,22 @@ namespace LinkedInSolver.Client.Models;
 public class ZipGrid(int size) : Grid(size)
 {
     /// Map from a number to a position
-    private Pos[] _numToPos = null!;
+    public Pos[] NumToPos { get; private set; } = null!;
 
     /// Map from a position to a number. If 0, the cell is empty
-    private int[,] _posToNum = null!;
+    public int[,] PosToNum { get; private set; } = null!;
 
     /// Collection of walls between cells, represented as pairs of positions where first position
     /// is always compared less than second
-    private HashSet<(Pos, Pos)> _walls = null!;
+    public HashSet<(Pos, Pos)> Walls { get; private set; } = null!;
 
     protected override void ResetState()
     {
         Solver = new ZipSolver(this);
-        _posToNum = new int[Size, Size];
-        _numToPos = new Pos[Size * Size + 1]; // +1 to ignore 0 index
-        Array.Fill(_numToPos, Pos.Invalid);
-        _walls = [];
+        PosToNum = new int[Size, Size];
+        NumToPos = new Pos[Size * Size + 1]; // +1 to ignore 0 index
+        Array.Fill(NumToPos, Pos.Invalid);
+        Walls = [];
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public class ZipGrid(int size) : Grid(size)
     /// </summary>
     public bool HasRightWall(Pos pos)
     {
-        return _walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Right)));
+        return Walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Right)));
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class ZipGrid(int size) : Grid(size)
     /// </summary>
     public bool HasBottomWall(Pos pos)
     {
-        return _walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Down)));
+        return Walls.Contains((pos, pos.GetNeighbor(Pos.Direction.Down)));
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class ZipGrid(int size) : Grid(size)
     public void ToggleWall(Pos pos1, Pos pos2)
     {
         var wall = Pos.GetSortedPair(pos1, pos2);
-        if (!_walls.Remove(wall)) _walls.Add(wall);
+        if (!Walls.Remove(wall)) Walls.Add(wall);
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public class ZipGrid(int size) : Grid(size)
         return Enumerable
             .Range(1, Size * Size)
             .Reverse()
-            .FirstOrDefault(i => _numToPos[i] != Pos.Invalid, -1);
+            .FirstOrDefault(i => NumToPos[i] != Pos.Invalid, -1);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public class ZipGrid(int size) : Grid(size)
     /// </summary>
     public int GetCellNumber(Pos pos)
     {
-        return _posToNum[pos.Row, pos.Col];
+        return PosToNum[pos.Row, pos.Col];
     }
 
     /// <summary>
@@ -80,8 +80,8 @@ public class ZipGrid(int size) : Grid(size)
     /// </summary>
     public void SetCellNumber(Pos pos, int number)
     {
-        _posToNum[pos.Row, pos.Col] = number;
-        _numToPos[number] = pos;
+        PosToNum[pos.Row, pos.Col] = number;
+        NumToPos[number] = pos;
     }
 
     /// <summary>
@@ -89,9 +89,9 @@ public class ZipGrid(int size) : Grid(size)
     /// </summary>
     public void ClearCellNumber(Pos pos)
     {
-        var number = _posToNum[pos.Row, pos.Col];
-        _posToNum[pos.Row, pos.Col] = 0;
-        _numToPos[number] = Pos.Invalid;
+        var number = PosToNum[pos.Row, pos.Col];
+        PosToNum[pos.Row, pos.Col] = 0;
+        NumToPos[number] = Pos.Invalid;
     }
 
     /// <summary>
@@ -102,6 +102,6 @@ public class ZipGrid(int size) : Grid(size)
     {
         return Enumerable
             .Range(1, Size * Size)
-            .FirstOrDefault(i => _numToPos[i] == Pos.Invalid, -1);
+            .FirstOrDefault(i => NumToPos[i] == Pos.Invalid, -1);
     }
 }

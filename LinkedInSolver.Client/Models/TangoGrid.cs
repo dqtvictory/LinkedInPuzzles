@@ -25,26 +25,26 @@ public class TangoGrid(int size) : Grid(size)
     }
 
     /// <summary>
-    ///     Map from a pair of two adjacent cells to a border type
-    /// </summary>
-    private Dictionary<(Pos, Pos), BorderType> _borders = null!;
-
-    /// <summary>
     ///     State array of cell types
     /// </summary>
-    private CellType[,] _cells = null!;
+    public CellType[,] Cells { get; private set; } = null!;
+
+    /// <summary>
+    ///     Map from a pair of two adjacent cells to a border type
+    /// </summary>
+    public Dictionary<(Pos, Pos), BorderType> Borders { get; private set; } = null!;
 
     protected override void ResetState()
     {
         Solver = new TangoSolver(this);
 
-        _cells = new CellType[Size, Size];
+        Cells = new CellType[Size, Size];
         // Assign every cell to type EMPTY initially
         for (var row = 0; row < Size; row++)
         for (var col = 0; col < Size; col++)
-            _cells[row, col] = CellType.Empty;
+            Cells[row, col] = CellType.Empty;
 
-        _borders = new Dictionary<(Pos, Pos), BorderType>();
+        Borders = new Dictionary<(Pos, Pos), BorderType>();
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class TangoGrid(int size) : Grid(size)
     /// </summary>
     public CellType GetCellType(Pos pos)
     {
-        return _cells[pos.Row, pos.Col];
+        return Cells[pos.Row, pos.Col];
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public class TangoGrid(int size) : Grid(size)
     /// </summary>
     public void SetCellType(Pos pos, CellType cellType)
     {
-        _cells[pos.Row, pos.Col] = cellType;
+        Cells[pos.Row, pos.Col] = cellType;
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class TangoGrid(int size) : Grid(size)
     /// </summary>
     public BorderType GetBorderType(Pos pos1, Pos pos2)
     {
-        return _borders.GetValueOrDefault(Pos.GetSortedPair(pos1, pos2), BorderType.None);
+        return Borders.GetValueOrDefault(Pos.GetSortedPair(pos1, pos2), BorderType.None);
     }
 
     /// <summary>
@@ -78,8 +78,8 @@ public class TangoGrid(int size) : Grid(size)
     {
         var posPair = Pos.GetSortedPair(pos1, pos2);
         if (borderType == BorderType.None)
-            _borders.Remove(posPair);
+            Borders.Remove(posPair);
         else
-            _borders[posPair] = borderType;
+            Borders[posPair] = borderType;
     }
 }
