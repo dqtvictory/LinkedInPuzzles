@@ -1,454 +1,457 @@
 @using LinkedInSolver.Client.Models
 <style>
-  .grid-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 24px;
-  }
+    .grid-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 24px;
+    }
 
-  .puzzle-grid-wrapper {
-    position: relative;
-    width: fit-content;
-  }
+    .puzzle-grid-wrapper {
+        position: relative;
+        width: fit-content;
+    }
 
-  .puzzle-grid {
-    display: grid;
-    gap: 1px;
-    background-color: #dee2e6;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    padding: 8px;
-    width: fit-content;
-    aspect-ratio: 1;
-  }
+    .puzzle-grid {
+        display: grid;
+        gap: 1px;
+        background-color: #dee2e6;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 8px;
+        width: fit-content;
+        aspect-ratio: 1;
+    }
 
-  .grid-cell {
-    border: 1px solid #e9ecef;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border-radius: 2px;
-    min-height: 60px;
-    min-width: 60px;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
+    .grid-cell {
+        border: 1px solid #e9ecef;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 2px;
+        min-height: 60px;
+        min-width: 60px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
 
-  .grid-cell.disabled {
-    cursor: not-allowed !important;
-    opacity: 0.6;
-    pointer-events: none;
-  }
+    .grid-cell.disabled {
+        cursor: not-allowed !important;
+        opacity: 0.6;
+        pointer-events: none;
+    }
 
-  .border-button {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    background-color: #90ee90;
-    border: 2px solid #90ee90;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    z-index: 10;
-  }
+    .border-button {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background-color: #90ee90;
+        border: 2px solid #90ee90;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 10;
+    }
 
-  .border-button:hover {
-    opacity: 1 !important;
-    background-color: #7fdd7f;
-  }
+    .border-button:hover {
+        opacity: 1 !important;
+        background-color: #7fdd7f;
+    }
 
-  .border-button.disabled {
-    cursor: not-allowed !important;
-    opacity: 0 !important;
-    pointer-events: none;
-  }
+    .border-button.disabled {
+        cursor: not-allowed !important;
+        opacity: 0 !important;
+        pointer-events: none;
+    }
 
-  .plus-icon {
-    color: #a9a9a9;
-    font-size: 16px;
-    font-weight: bold;
-    line-height: 1;
-  }
+    .plus-icon {
+        color: #a9a9a9;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 1;
+    }
 
-  .debug-message {
-    margin-top: 16px;
-    padding: 8px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    font-family: monospace;
-    text-align: center;
-  }
+    .debug-message {
+        margin-top: 16px;
+        padding: 8px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        font-family: monospace;
+        text-align: center;
+    }
 
-  .grid-cell:hover {
-    background-color: #f8f9fa;
-    transform: scale(0.95);
-  }
+    .grid-cell:hover {
+        background-color: #f8f9fa;
+        transform: scale(0.95);
+    }
 
-  .puzzle-content {
-    transition: opacity 0.3s ease;
-  }
+    .puzzle-content {
+        transition: opacity 0.3s ease;
+    }
 
-  .puzzle-content.disabled {
-    opacity: 0.6;
-    pointer-events: none;
-  }
+    .puzzle-content.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
 </style>
 
 <PageTitle>@CurrentPuzzle.Name - LinkedIn Puzzles</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
 
-  <MudBreadcrumbs Items="_breadcrumbItems" Class="mb-4"/>
+    <MudBreadcrumbs Items="_breadcrumbItems" Class="mb-4"/>
 
-  <div class="puzzle-content @(_solverRunning ? "disabled" : "")">
-    <div class="d-flex align-center mb-4">
-      <img src="@CurrentPuzzle.Icon" alt="@CurrentPuzzle.Name"
-           style="width: 48px; height: 48px; margin-right: 16px;"/>
-      <MudText Typo="Typo.h4" GutterBottom="false">
-        @CurrentPuzzle.Name
-      </MudText>
-    </div>
-
-    <div class="d-flex justify-center mb-4">
-      <div class="d-flex align-center">
-        <MudButton Variant="Variant.Filled" Color="Color.Success" @onclick="ValidateAndSolve"
-                   Disabled="@_solverRunning" Style="margin: 8px">
-          @if (_solverRunning)
-          {
-            <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true"/>
-            <span style="margin-left: 8px;">Processing...</span>
-          }
-          else
-          {
-            <span>Validate and Solve</span>
-          }
-        </MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OnResizeGrid" Disabled="@_solverRunning"
-                   Style="margin: 8px">
-          Reset Grid
-        </MudButton>
-        <MudTextField @bind-Value="_gridSizeInput" Label="Grid Size" Variant="Variant.Outlined" Margin="Margin.Dense"
-                      Style="width: 120px; margin-left: 8px;" Error="@_showError" ErrorText="@_errorMessage" T="int"
-                      Disabled="@_solverRunning"/>
-      </div>
-    </div>
-
-    <div class="grid-container">
-      <div class="puzzle-grid-wrapper">
-        <div class="puzzle-grid"
-             style="grid-template-columns: repeat(@CurrentGrid.Size, 1fr); grid-template-rows: repeat(@CurrentGrid.Size, 1fr);">
-          @for (var row = 0; row < CurrentGrid.Size; row++)
-          for (var col = 0; col < CurrentGrid.Size; col++)
-          {
-            var pos = new Pos(row, col);
-
-            <!-- cell contents -->
-            <div class="@GetCellClasses(pos)" style="background-color: @GetCellBgColor(pos)"
-                 @onclick="() => OnCellClick(pos)">
-              @PageGetCellContent?.Invoke(pos)
-            </div>
-
-            <!-- cell borders -->
-            @if (PageOnBorderClick == null)
-            {
-              continue;
-            }
-
-            // Horizontal border button (below current cell)
-            if (row < CurrentGrid.Size - 1)
-            {
-              var downPos = pos.GetNeighbor(Pos.Direction.Down);
-              var borderContent = PageGetBorderContent?.Invoke(pos, downPos);
-              var customBorderClasses = PageGetBorderClasses?.Invoke(pos, downPos) ?? [];
-              var hTop = GetHorizontalBorderTop(pos);
-              var hLeft = GetHorizontalBorderLeft(pos);
-
-              var borderClasses = GetBorderClasses(pos, downPos, customBorderClasses);
-              var finalClass = $"{borderClasses} horizontal";
-
-              <div class="@finalClass" style="top: @(hTop)px; left: @(hLeft)px;"
-                   @onclick="() => OnBorderClick(pos, downPos)">
-                @if (borderContent != null)
-                {
-                  <span>@borderContent</span>
-                }
-                else
-                {
-                  <span class="plus-icon">+</span>
-                }
-              </div>
-            }
-
-            // Vertical border button (right of current cell)
-            if (col < CurrentGrid.Size - 1)
-            {
-              var rightPos = pos.GetNeighbor(Pos.Direction.Right);
-              var borderContent = PageGetBorderContent?.Invoke(pos, rightPos);
-              var customBorderClasses = PageGetBorderClasses?.Invoke(pos, rightPos) ?? [];
-              var vTop = GetVerticalBorderTop(pos);
-              var vLeft = GetVerticalBorderLeft(pos);
-
-              var borderClasses = GetBorderClasses(pos, rightPos, customBorderClasses);
-              var finalClass = $"{borderClasses} vertical";
-
-              <div class="@finalClass" style="top: @(vTop)px; left: @(vLeft)px;"
-                   @onclick="() => OnBorderClick(pos, rightPos)">
-                @if (borderContent != null)
-                {
-                  <span>@borderContent</span>
-                }
-                else
-                {
-                  <span class="plus-icon">+</span>
-                }
-              </div>
-            }
-          }
+    <div class="puzzle-content @(_solverRunning ? "disabled" : "")">
+        <div class="d-flex align-center mb-4">
+            <img src="@CurrentPuzzle.Icon" alt="@CurrentPuzzle.Name"
+                 style="width: 48px; height: 48px; margin-right: 16px;"/>
+            <MudText Typo="Typo.h4" GutterBottom="false">
+                @CurrentPuzzle.Name
+            </MudText>
         </div>
-      </div>
-    </div>
 
-    <div class="debug-message">
-      @_debugMessage
+        <div class="d-flex justify-center mb-4">
+            <div class="d-flex align-center">
+                <MudButton Variant="Variant.Filled" Color="Color.Success" @onclick="ValidateAndSolve"
+                           Disabled="@_solverRunning" Style="margin: 8px">
+                    @if (_solverRunning)
+                    {
+                        <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true"/>
+                        <span style="margin-left: 8px;">Processing...</span>
+                    }
+                    else
+                    {
+                        <span>Validate and Solve</span>
+                    }
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OnResizeGrid"
+                           Disabled="@_solverRunning"
+                           Style="margin: 8px">
+                    Reset Grid
+                </MudButton>
+                <MudTextField @bind-Value="_gridSizeInput" Label="Grid Size" Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Style="width: 120px; margin-left: 8px;" Error="@_showError" ErrorText="@_errorMessage"
+                              T="int"
+                              Disabled="@_solverRunning"/>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <div class="puzzle-grid-wrapper">
+                <div class="puzzle-grid"
+                     style="grid-template-columns: repeat(@CurrentGrid.Size, 1fr); grid-template-rows: repeat(@CurrentGrid.Size, 1fr);">
+                    @for (var row = 0; row < CurrentGrid.Size; row++)
+                    for (var col = 0; col < CurrentGrid.Size; col++)
+                    {
+                        var pos = new Pos(row, col);
+
+                        <!-- cell contents -->
+                        <div class="@GetCellClasses(pos)" style="background-color: @GetCellBgColor(pos)"
+                             @onclick="() => OnCellClick(pos)">
+                            @PageGetCellContent?.Invoke(pos)
+                        </div>
+
+                        <!-- cell borders -->
+                        @if (PageOnBorderClick == null)
+                        {
+                            continue;
+                        }
+
+                        // Horizontal border button (below current cell)
+                        if (row < CurrentGrid.Size - 1)
+                        {
+                            var downPos = pos.GetNeighbor(Pos.Direction.Down);
+                            var borderContent = PageGetBorderContent?.Invoke(pos, downPos);
+                            var customBorderClasses = PageGetBorderClasses?.Invoke(pos, downPos) ?? [];
+                            var hTop = GetHorizontalBorderTop(pos);
+                            var hLeft = GetHorizontalBorderLeft(pos);
+
+                            var borderClasses = GetBorderClasses(pos, downPos, customBorderClasses);
+                            var finalClass = $"{borderClasses} horizontal";
+
+                            <div class="@finalClass" style="top: @(hTop)px; left: @(hLeft)px;"
+                                 @onclick="() => OnBorderClick(pos, downPos)">
+                                @if (borderContent != null)
+                                {
+                                    <span>@borderContent</span>
+                                }
+                                else
+                                {
+                                    <span class="plus-icon">+</span>
+                                }
+                            </div>
+                        }
+
+                        // Vertical border button (right of current cell)
+                        if (col < CurrentGrid.Size - 1)
+                        {
+                            var rightPos = pos.GetNeighbor(Pos.Direction.Right);
+                            var borderContent = PageGetBorderContent?.Invoke(pos, rightPos);
+                            var customBorderClasses = PageGetBorderClasses?.Invoke(pos, rightPos) ?? [];
+                            var vTop = GetVerticalBorderTop(pos);
+                            var vLeft = GetVerticalBorderLeft(pos);
+
+                            var borderClasses = GetBorderClasses(pos, rightPos, customBorderClasses);
+                            var finalClass = $"{borderClasses} vertical";
+
+                            <div class="@finalClass" style="top: @(vTop)px; left: @(vLeft)px;"
+                                 @onclick="() => OnBorderClick(pos, rightPos)">
+                                @if (borderContent != null)
+                                {
+                                    <span>@borderContent</span>
+                                }
+                                else
+                                {
+                                    <span class="plus-icon">+</span>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="debug-message">
+            @_debugMessage
+        </div>
     </div>
-  </div>
 
 </MudContainer>
 
 @code {
 
-  // Dynamic positioning constants (taken from CSS)
-  const int CellSize = 60, CellGap = 1, CellSizeWithGap = CellSize + CellGap;
-  const int GridPadding = 8;
-  const int BorderButtonSize = 24;
-  const int Correction = 2;
+    // Dynamic positioning constants (taken from CSS)
+    const int CellSize = 60, CellGap = 1, CellSizeWithGap = CellSize + CellGap;
+    const int GridPadding = 8;
+    const int BorderButtonSize = 24;
+    const int Correction = 2;
 
-  /// <summary>
-  ///     Current puzzle
-  /// </summary>
-  [Parameter]
-  public Puzzle CurrentPuzzle { get; set; } = null!;
+    /// <summary>
+    ///     Current puzzle
+    /// </summary>
+    [Parameter]
+    public Puzzle CurrentPuzzle { get; set; } = null!;
 
-  /// <summary>
-  ///     Grid of the current puzzle
-  /// </summary>
-  [Parameter]
-  public Grid CurrentGrid { get; set; } = null!;
+    /// <summary>
+    ///     Grid of the current puzzle
+    /// </summary>
+    [Parameter]
+    public Grid CurrentGrid { get; set; } = null!;
 
-  /// <summary>
-  ///     Get background color for each cell
-  /// </summary>
-  [Parameter]
-  public Func<Pos, string>? PageGetCellBgColor { get; set; }
+    /// <summary>
+    ///     Get background color for each cell
+    /// </summary>
+    [Parameter]
+    public Func<Pos, string>? PageGetCellBgColor { get; set; }
 
-  /// <summary>
-  ///     Get CSS classes for each cell's div element
-  /// </summary>
-  [Parameter]
-  public Func<Pos, List<string>>? PageGetCellClasses { get; set; }
+    /// <summary>
+    ///     Get CSS classes for each cell's div element
+    /// </summary>
+    [Parameter]
+    public Func<Pos, List<string>>? PageGetCellClasses { get; set; }
 
-  /// <summary>
-  ///     Get content for each cell
-  /// </summary>
-  [Parameter]
-  public Func<Pos, RenderFragment>? PageGetCellContent { get; set; }
+    /// <summary>
+    ///     Get content for each cell
+    /// </summary>
+    [Parameter]
+    public Func<Pos, RenderFragment>? PageGetCellContent { get; set; }
 
-  /// <summary>
-  ///     Action to be invoked when a border between two cells is clicked
-  /// </summary>
-  [Parameter]
-  public Action<Pos, Pos>? PageOnBorderClick { get; set; }
+    /// <summary>
+    ///     Action to be invoked when a border between two cells is clicked
+    /// </summary>
+    [Parameter]
+    public Action<Pos, Pos>? PageOnBorderClick { get; set; }
 
-  /// <summary>
-  ///     Action to be invoked when a cell is clicked
-  /// </summary>
-  [Parameter]
-  public Action<Pos> PageOnCellClick { get; set; } = null!;
+    /// <summary>
+    ///     Action to be invoked when a cell is clicked
+    /// </summary>
+    [Parameter]
+    public Action<Pos> PageOnCellClick { get; set; } = null!;
 
-  /// <summary>
-  ///     Get border content for display (e.g., "=", "×", or null for hover)
-  /// </summary>
-  [Parameter]
-  public Func<Pos, Pos, string?>? PageGetBorderContent { get; set; }
+    /// <summary>
+    ///     Get border content for display (e.g., "=", "×", or null for hover)
+    /// </summary>
+    [Parameter]
+    public Func<Pos, Pos, string?>? PageGetBorderContent { get; set; }
 
-  /// <summary>
-  ///     Get border CSS classes
-  /// </summary>
-  [Parameter]
-  public Func<Pos, Pos, List<string>>? PageGetBorderClasses { get; set; }
+    /// <summary>
+    ///     Get border CSS classes
+    /// </summary>
+    [Parameter]
+    public Func<Pos, Pos, List<string>>? PageGetBorderClasses { get; set; }
 
-  /// <summary>
-  ///     UI input for grid size for resizing the grid
-  /// </summary>
-  private int _gridSizeInput = Grid.DefaultSize;
+    /// <summary>
+    ///     UI input for grid size for resizing the grid
+    /// </summary>
+    private int _gridSizeInput = Grid.DefaultSize;
 
-  /// <summary>
-  ///     Error message visibility for grid size input
-  /// </summary>
-  private bool _showError;
+    /// <summary>
+    ///     Error message visibility for grid size input
+    /// </summary>
+    private bool _showError;
 
-  /// <summary>
-  ///     Error message content for grid size input, when _showError is true
-  /// </summary>
-  private string _errorMessage = string.Empty;
+    /// <summary>
+    ///     Error message content for grid size input, when _showError is true
+    /// </summary>
+    private string _errorMessage = string.Empty;
 
-  /// <summary>
-  ///     Debug message displayed at page's bottom
-  /// </summary>
-  private string _debugMessage = string.Empty;
+    /// <summary>
+    ///     Debug message displayed at page's bottom
+    /// </summary>
+    private string _debugMessage = string.Empty;
 
-  /// <summary>
-  ///     Breadcrumb items for navigation
-  /// </summary>
-  private List<BreadcrumbItem> _breadcrumbItems = null!;
+    /// <summary>
+    ///     Breadcrumb items for navigation
+    /// </summary>
+    private List<BreadcrumbItem> _breadcrumbItems = null!;
 
-  /// <summary>
-  ///     Whether the solver is running, which disables UI interactions
-  /// </summary>
-  private bool _solverRunning;
+    /// <summary>
+    ///     Whether the solver is running, which disables UI interactions
+    /// </summary>
+    private bool _solverRunning;
 
-  protected override void OnInitialized()
-  {
-    _gridSizeInput = Grid.DefaultSize;
-    _breadcrumbItems =
-    [
-      new BreadcrumbItem("Home", "/", icon: Icons.Material.Filled.Home),
-      new BreadcrumbItem(CurrentPuzzle.Name, null, true)
-    ];
-    Initialize();
-  }
-
-  private void OnResizeGrid()
-  {
-    if (_solverRunning)
+    protected override void OnInitialized()
     {
-      return;
+        _gridSizeInput = Grid.DefaultSize;
+        _breadcrumbItems =
+        [
+            new BreadcrumbItem("Home", "/", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem(CurrentPuzzle.Name, null, true)
+        ];
+        Initialize();
     }
 
-    if (_gridSizeInput is < Grid.MinSize or > Grid.MaxSize)
+    private void OnResizeGrid()
     {
-      _showError = true;
-      _errorMessage = $"Grid Size should be between {Grid.MinSize} and {Grid.MaxSize}";
-      StateHasChanged();
-      return;
+        if (_solverRunning)
+        {
+            return;
+        }
+
+        if (_gridSizeInput is < Grid.MinSize or > Grid.MaxSize)
+        {
+            _showError = true;
+            _errorMessage = $"Grid Size should be between {Grid.MinSize} and {Grid.MaxSize}";
+            StateHasChanged();
+            return;
+        }
+
+        Initialize();
+        CurrentGrid.Reset(_gridSizeInput);
+        StateHasChanged();
     }
 
-    Initialize();
-    CurrentGrid.Reset(_gridSizeInput);
-    StateHasChanged();
-  }
-
-  private void Initialize()
-  {
-    _showError = false;
-    _errorMessage = string.Empty;
-    _debugMessage = string.Empty;
-  }
-
-  private void OnCellClick(Pos pos)
-  {
-    if (_solverRunning)
+    private void Initialize()
     {
-      return;
+        _showError = false;
+        _errorMessage = string.Empty;
+        _debugMessage = string.Empty;
     }
 
-    PageOnCellClick(pos);
-    StateHasChanged();
-  }
-
-  private void OnBorderClick(Pos pos1, Pos pos2)
-  {
-    if (_solverRunning)
+    private void OnCellClick(Pos pos)
     {
-      return;
+        if (_solverRunning)
+        {
+            return;
+        }
+
+        PageOnCellClick(pos);
+        StateHasChanged();
     }
 
-    PageOnBorderClick!.Invoke(pos1, pos2);
-    StateHasChanged();
-  }
-
-  private string GetCellBgColor(Pos pos)
-  {
-    return PageGetCellBgColor?.Invoke(pos) ?? "#FFFFFF"; // Default white background
-  }
-
-  private string GetCellClasses(Pos pos)
-  {
-    var classes = PageGetCellClasses?.Invoke(pos) ?? [];
-    classes.Add("grid-cell");
-    if (_solverRunning)
+    private void OnBorderClick(Pos pos1, Pos pos2)
     {
-      classes.Add("disabled");
+        if (_solverRunning)
+        {
+            return;
+        }
+
+        PageOnBorderClick!.Invoke(pos1, pos2);
+        StateHasChanged();
     }
 
-    return string.Join(" ", classes);
-  }
-
-  private string GetBorderClasses(Pos pos1, Pos pos2, List<string> customClasses)
-  {
-    var baseClass = _solverRunning ? "border-button disabled" : "border-button";
-    return string.Join(" ", customClasses.Prepend(baseClass));
-  }
-
-  // Position at the bottom of the current cell
-  private static int GetHorizontalBorderTop(Pos pos)
-  {
-    return GridPadding + (pos.Row + 1) * CellSizeWithGap - BorderButtonSize / 2 + Correction;
-  }
-
-  // Position at the center of the current cell
-  private static int GetHorizontalBorderLeft(Pos pos)
-  {
-    return GridPadding + pos.Col * CellSizeWithGap + (CellSize - BorderButtonSize) / 2 + Correction;
-  }
-
-  // Position at the center of the current cell
-  private static int GetVerticalBorderTop(Pos pos)
-  {
-    return GridPadding + pos.Row * CellSizeWithGap + (CellSize - BorderButtonSize) / 2 + Correction;
-  }
-
-  // Position at the right of the current cell
-  private static int GetVerticalBorderLeft(Pos pos)
-  {
-    return GridPadding + (pos.Col + 1) * CellSizeWithGap - BorderButtonSize / 2 + Correction;
-  }
-
-  private async Task ValidateAndSolve()
-  {
-    if (_solverRunning)
+    private string GetCellBgColor(Pos pos)
     {
-      return;
+        return PageGetCellBgColor?.Invoke(pos) ?? "#FFFFFF"; // Default white background
     }
 
-    _debugMessage = "Validating...";
-    _solverRunning = true;
-    StateHasChanged();
-    var validationError = await Task.Run(CurrentGrid.Validate);
-    if (validationError != null)
+    private string GetCellClasses(Pos pos)
     {
-      _debugMessage = $"Validation failed: {validationError}";
-      _solverRunning = false;
-      StateHasChanged();
-      return;
+        var classes = PageGetCellClasses?.Invoke(pos) ?? [];
+        classes.Add("grid-cell");
+        if (_solverRunning)
+        {
+            classes.Add("disabled");
+        }
+
+        return string.Join(" ", classes);
     }
 
-    _debugMessage = "Validation successful, solving...";
-    StateHasChanged();
+    private string GetBorderClasses(Pos pos1, Pos pos2, List<string> customClasses)
+    {
+        var baseClass = _solverRunning ? "border-button disabled" : "border-button";
+        return string.Join(" ", customClasses.Prepend(baseClass));
+    }
 
-    var solution = await Task.Run(CurrentGrid.Solve);
-    // Placeholder: display solution
+    // Position at the bottom of the current cell
+    private static int GetHorizontalBorderTop(Pos pos)
+    {
+        return GridPadding + (pos.Row + 1) * CellSizeWithGap - BorderButtonSize / 2 + Correction;
+    }
 
-    _solverRunning = false;
-    StateHasChanged();
-  }
+    // Position at the center of the current cell
+    private static int GetHorizontalBorderLeft(Pos pos)
+    {
+        return GridPadding + pos.Col * CellSizeWithGap + (CellSize - BorderButtonSize) / 2 + Correction;
+    }
+
+    // Position at the center of the current cell
+    private static int GetVerticalBorderTop(Pos pos)
+    {
+        return GridPadding + pos.Row * CellSizeWithGap + (CellSize - BorderButtonSize) / 2 + Correction;
+    }
+
+    // Position at the right of the current cell
+    private static int GetVerticalBorderLeft(Pos pos)
+    {
+        return GridPadding + (pos.Col + 1) * CellSizeWithGap - BorderButtonSize / 2 + Correction;
+    }
+
+    private async Task ValidateAndSolve()
+    {
+        if (_solverRunning)
+        {
+            return;
+        }
+
+        _debugMessage = "Validating...";
+        _solverRunning = true;
+        StateHasChanged();
+        var validationError = await Task.Run(CurrentGrid.Validate);
+        if (validationError != null)
+        {
+            _debugMessage = $"Validation failed: {validationError}";
+            _solverRunning = false;
+            StateHasChanged();
+            return;
+        }
+
+        _debugMessage = "Validation successful, solving...";
+        StateHasChanged();
+
+        var solution = await Task.Run(CurrentGrid.Solve);
+        // Placeholder: display solution
+
+        _solverRunning = false;
+        StateHasChanged();
+    }
 
 }
