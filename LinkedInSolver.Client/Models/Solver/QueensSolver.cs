@@ -5,7 +5,7 @@ public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
     /// <summary>
     ///     Solve the Queens puzzle
     /// </summary>
-    /// <returns>List of positions where the queens should be placed</returns>
+    /// <returns>List of cells where the queens should be placed, empty if not solvable</returns>
     public override List<Pos> Solve()
     {
         var grid = (QueensGrid)PuzzleGrid;
@@ -19,7 +19,7 @@ public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
         {
             var region = state[row, col];
             if (!regions.ContainsKey(region))
-                regions[region] = new List<Pos>();
+                regions[region] = [];
             regions[region].Add(new Pos(row, col));
         }
 
@@ -27,9 +27,7 @@ public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
             .OrderBy(pair => pair.Value.Count)
             .Select(pair => pair.Value)
             .ToList();
-
-        var res = SolveImpl(sortedRegions, [], 0);
-        return res.ToList();
+        return SolveImpl(sortedRegions, [], 0);
     }
 
     public override string? Validate()
@@ -104,26 +102,32 @@ public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
                                                      Math.Abs(q.Col - pos.Col) != 1));
     }
 
-    private HashSet<Pos> SolveImpl(List<List<Pos>> regions, HashSet<Pos> queens, int regionIndex)
+    /// <summary>
+    ///     Solve the Queens puzzle recursively
+    /// </summary>
+    /// <param name="regions">List of regions where each region is a collection of cells</param>
+    /// <param name="queens">The placed queens so far</param>
+    /// <param name="regionIndex">Index of the region where we are trying to place a new queen</param>
+    /// <returns>List of cells where the queens should be placed, empty if not solvable</returns>
+    private List<Pos> SolveImpl(List<List<Pos>> regions, HashSet<Pos> queens, int regionIndex)
     {
         // Terminal: queens placed in all regions, return the current set of queens
-        if (regionIndex >= regions.Count) return queens;
+        if (regionIndex >= regions.Count) return queens.ToList();
 
         // Get the current region's cells
         var currentRegion = regions[regionIndex];
 
         // Try to place a queen in each cell of the current region
-        foreach (var pos in currentRegion)
-            if (CanPlaceQueen(queens, pos))
-            {
-                // Place the queen and continue to the next region
-                queens.Add(pos);
-                var result = SolveImpl(regions, queens, regionIndex + 1);
-                if (result.Count == regions.Count)
-                    // Found a valid solution
-                    return result;
-                queens.Remove(pos);
-            }
+        foreach (var pos in currentRegion.Where(pos => CanPlaceQueen(queens, pos)))
+        {
+            // Place the queen and continue to the next region
+            queens.Add(pos);
+            var result = SolveImpl(regions, queens, regionIndex + 1);
+            if (result.Count > 0)
+                // Found a valid solution
+                return result;
+            queens.Remove(pos);
+        }
 
         // No valid placement found in this branch
         return [];
