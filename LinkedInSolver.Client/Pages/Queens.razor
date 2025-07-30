@@ -44,7 +44,7 @@
         color: #333;
     }
 
-    .queen-symbol {
+    .queen-solution {
         font-size: 24px;
         color: #99830b;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -119,18 +119,14 @@
 
     private RenderFragment? GetCellContent(Pos pos)
     {
-        if (_grid.Solutions.Contains(pos))
-            return @<span class="queen-symbol">♛</span>;
+        if (_grid.Solution is HashSet<Pos> solution && solution.Contains(pos))
+            return @<span class="queen-solution">♛</span>;
         return null;
     }
 
     private void OnSolutionFound(List<Pos> solution)
     {
-        // Store the solution positions
-        foreach (var pos in solution)
-        {
-            _grid.Solutions.Add(pos);
-        }
+        _grid.Solution = solution.ToHashSet();
     }
 
 }

@@ -25,7 +25,8 @@
 <PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid"
             PageGetCellBgColor="GetCellBgColor" PageGetCellContent="GetCellContent"
             PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick"
-            PageGetBorderContent="GetBorderContent" PageGetBorderClasses="GetBorderClasses"/>
+            PageGetBorderContent="GetBorderContent" PageGetBorderClasses="GetBorderClasses"
+            PageOnSolutionFound="OnSolutionFound"/>
 
 @code {
     private static readonly Puzzle Puzzle = Puzzle.GetPuzzle("Tango");
@@ -42,13 +43,21 @@
 
     private RenderFragment? GetCellContent(Pos pos)
     {
-        return _grid.GetCellType(pos) switch
+        switch (_grid.GetCellType(pos))
         {
-            TangoGrid.CellType.Empty => null,
-            TangoGrid.CellType.Sun => @<span class="input-cell">🔆</span>,
-            TangoGrid.CellType.Moon => @<span class="input-cell">⏾</span>,
-            _ => throw new InvalidOperationException("Unexpected cell type")
-        };
+            case TangoGrid.CellType.Moon:
+                return @<span class="input-cell">⏾</span>;
+            case TangoGrid.CellType.Sun:
+                return @<span class="input-cell">🔆</span>;
+            case TangoGrid.CellType.Empty:
+                if (_grid.Solution is HashSet<Pos> solution)
+                    return solution.Contains(pos)
+                        ? @<span class="input-cell">⏾</span>
+                        : @<span class="input-cell">🔆</span>;
+                return null;
+            default:
+                throw new InvalidOperationException("Unexpected cell type");
+        }
     }
 
     private void OnCellClick(Pos pos)
@@ -79,7 +88,7 @@
     {
         return _grid.GetBorderType(pos1, pos2) switch
         {
-            TangoGrid.BorderType.None => null, // Show hover "+" icon
+            TangoGrid.BorderType.None => null, // Show hover "+" icon, handled by PuzzleGrid component
             TangoGrid.BorderType.Equal => "=", // Show permanent equal sign
             TangoGrid.BorderType.Opposite => "×", // Show permanent x character
             _ => throw new InvalidOperationException("Unexpected border type")
@@ -90,6 +99,11 @@
     {
         var borderType = _grid.GetBorderType(pos1, pos2);
         return borderType != TangoGrid.BorderType.None ? ["permanent"] : [];
+    }
+
+    private void OnSolutionFound(List<Pos> solution)
+    {
+        _grid.Solution = solution.ToHashSet();
     }
 
 }

@@ -32,7 +32,8 @@
 </style>
 
 <PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid" PageGetCellClasses="GetCellClasses"
-            PageGetCellContent="GetCellContent" PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick"/>
+            PageGetCellContent="GetCellContent" PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick"
+            PageOnSolutionFound="OnSolutionFound"/>
 
 @code {
     private static readonly Puzzle Puzzle = Puzzle.GetPuzzle("Zip");
@@ -98,6 +99,11 @@
     private void OnBorderClick(Pos pos1, Pos pos2)
     {
         _grid.ToggleWall(pos1, pos2);
+    }
+
+    private void OnSolutionFound(List<Pos> solution)
+    {
+        _grid.Solution = solution;
     }
 
 }

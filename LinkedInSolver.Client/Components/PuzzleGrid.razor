@@ -162,6 +162,8 @@
                         <!-- cell borders -->
                         @if (PageOnBorderClick == null)
                         {
+                            // Disable border buttons if no click handler is provided or if a solution exists. In the
+                            // latter case, the user must reset the grid before being able to interact with it again
                             continue;
                         }
 
@@ -183,7 +185,7 @@
                                 {
                                     <span>@borderContent</span>
                                 }
-                                else
+                                else if (!_solverRunning && !CurrentGrid.HasSolution())
                                 {
                                     <span class="plus-icon">+</span>
                                 }
@@ -262,7 +264,7 @@
     ///     Get content for each cell
     /// </summary>
     [Parameter]
-    public Func<Pos, RenderFragment>? PageGetCellContent { get; set; }
+    public Func<Pos, RenderFragment?>? PageGetCellContent { get; set; }
 
     /// <summary>
     ///     Action to be invoked when a border between two cells is clicked
@@ -364,8 +366,10 @@
 
     private void OnCellClick(Pos pos)
     {
-        if (_solverRunning)
+        if (_solverRunning || CurrentGrid.HasSolution())
         {
+            // Disable cell clicks while solver is running or if a solution already exists. In latter case, user must
+            // reset the grid before being able to interact with it again
             return;
         }
 
@@ -375,8 +379,10 @@
 
     private void OnBorderClick(Pos pos1, Pos pos2)
     {
-        if (_solverRunning)
+        if (_solverRunning || CurrentGrid.HasSolution())
         {
+            // Disable border clicks while solver is running or if a solution already exists. In latter case, user must
+            // reset the grid before being able to interact with it again
             return;
         }
 
@@ -429,7 +435,7 @@
 
     private async Task ValidateAndSolve()
     {
-        if (_solverRunning)
+        if (_solverRunning || CurrentGrid.HasSolution())
         {
             return;
         }

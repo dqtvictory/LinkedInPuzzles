@@ -9,12 +9,6 @@ public class QueensGrid(int size) : Grid(size)
     /// </summary>
     public int[,] State { get; private set; } = null!;
 
-    /// <summary>
-    ///     If not empty, contains the solutions found by the solver. This is mainly used by the UI
-    ///     to display the solution
-    /// </summary>
-    public HashSet<Pos> Solutions { get; private set; } = null!;
-
     protected override void ResetState()
     {
         Solver = new QueensSolver(this);
@@ -23,7 +17,6 @@ public class QueensGrid(int size) : Grid(size)
         for (var row = 0; row < Size; row++)
         for (var col = 0; col < Size; col++)
             State[row, col] = 0;
-        Solutions = [];
     }
 
     /// <summary>
