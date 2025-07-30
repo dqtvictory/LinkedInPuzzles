@@ -21,7 +21,8 @@ public abstract class PuzzleSolver(Grid grid)
     /// </summary>
     /// <returns>
     ///     A list of positions as a common solution's type. Depending on the specific puzzle, the
-    ///     list has a different meaning
+    ///     list has a different meaning, but an empty list always means that the puzzle is not
+    ///     solvable
     /// </returns>
     public abstract List<Pos> Solve();
 }

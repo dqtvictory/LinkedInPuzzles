@@ -2,34 +2,6 @@
 
 public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
 {
-    /// <summary>
-    ///     Solve the Queens puzzle
-    /// </summary>
-    /// <returns>List of cells where the queens should be placed, empty if not solvable</returns>
-    public override List<Pos> Solve()
-    {
-        var grid = (QueensGrid)PuzzleGrid;
-        var state = grid.State;
-
-        // The approach is simple: go through each region and try to place a queen in each cell. For
-        // this reason, we want to go from the region with the smallest size to the largest one
-        var regions = new Dictionary<int, List<Pos>>();
-        for (var row = 0; row < grid.Size; row++)
-        for (var col = 0; col < grid.Size; col++)
-        {
-            var region = state[row, col];
-            if (!regions.ContainsKey(region))
-                regions[region] = [];
-            regions[region].Add(new Pos(row, col));
-        }
-
-        var sortedRegions = regions
-            .OrderBy(pair => pair.Value.Count)
-            .Select(pair => pair.Value)
-            .ToList();
-        return SolveImpl(sortedRegions, [], 0);
-    }
-
     public override string? Validate()
     {
         var grid = (QueensGrid)PuzzleGrid;
@@ -80,6 +52,34 @@ public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///     Solve the Queens puzzle
+    /// </summary>
+    /// <returns>List of cells where the queens should be placed, empty if not solvable</returns>
+    public override List<Pos> Solve()
+    {
+        var grid = (QueensGrid)PuzzleGrid;
+        var state = grid.State;
+
+        // The approach is simple: go through each region and try to place a queen in each cell. For
+        // this reason, we want to go from the region with the smallest size to the largest one
+        var regions = new Dictionary<int, List<Pos>>();
+        for (var row = 0; row < grid.Size; row++)
+        for (var col = 0; col < grid.Size; col++)
+        {
+            var region = state[row, col];
+            if (!regions.ContainsKey(region))
+                regions[region] = [];
+            regions[region].Add(new Pos(row, col));
+        }
+
+        var sortedRegions = regions
+            .OrderBy(pair => pair.Value.Count)
+            .Select(pair => pair.Value)
+            .ToList();
+        return SolveImpl(sortedRegions, [], 0);
     }
 
     /// <summary>

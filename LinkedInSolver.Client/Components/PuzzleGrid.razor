@@ -289,6 +289,12 @@
     public Func<Pos, Pos, List<string>>? PageGetBorderClasses { get; set; }
 
     /// <summary>
+    ///     Action to be invoked when a solution is found to handle puzzle-specific display
+    /// </summary>
+    [Parameter]
+    public Action<List<Pos>>? PageOnSolutionFound { get; set; }
+
+    /// <summary>
     ///     UI input for grid size for resizing the grid
     /// </summary>
     private int _gridSizeInput = Grid.DefaultSize;
@@ -401,25 +407,21 @@
         return string.Join(" ", customClasses.Prepend(baseClass));
     }
 
-    // Position at the bottom of the current cell
     private static int GetHorizontalBorderTop(Pos pos)
     {
         return GridPadding + (pos.Row + 1) * CellSizeWithGap - BorderButtonSize / 2 + Correction;
     }
 
-    // Position at the center of the current cell
     private static int GetHorizontalBorderLeft(Pos pos)
     {
         return GridPadding + pos.Col * CellSizeWithGap + (CellSize - BorderButtonSize) / 2 + Correction;
     }
 
-    // Position at the center of the current cell
     private static int GetVerticalBorderTop(Pos pos)
     {
         return GridPadding + pos.Row * CellSizeWithGap + (CellSize - BorderButtonSize) / 2 + Correction;
     }
 
-    // Position at the right of the current cell
     private static int GetVerticalBorderLeft(Pos pos)
     {
         return GridPadding + (pos.Col + 1) * CellSizeWithGap - BorderButtonSize / 2 + Correction;
@@ -448,7 +450,16 @@
         StateHasChanged();
 
         var solution = await Task.Run(CurrentGrid.Solve);
-        _debugMessage = $"{string.Join(' ', solution)}";
+        if (solution.Count == 0)
+        {
+            // No solution found
+            _debugMessage = "No solution found.";
+        }
+        else
+        {
+            _debugMessage = "Solution found";
+            PageOnSolutionFound?.Invoke(solution);
+        }
 
         _solverRunning = false;
         StateHasChanged();

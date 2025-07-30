@@ -43,20 +43,24 @@
         font-weight: bold;
         color: #333;
     }
+
+    .queen-symbol {
+        font-size: 24px;
+        color: #99830b;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
 </style>
 
 <PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid" PageOnCellClick="OnCellClick"
-            PageGetCellBgColor="GetCellBgColor"/>
+            PageGetCellBgColor="GetCellBgColor" PageGetCellContent="GetCellContent"
+            PageOnSolutionFound="OnSolutionFound"/>
 
 <div class="region-selector">
     @for (var i = 0; i < RegionColors.Length; i++)
     {
-        var region = i;
-        var isActive = _activeRegion == region;
-        var buttonStyle = $"background-color: {RegionColors[region]}; color: black;";
-
-        <button class="region-button @(isActive ? "selected" : "")"
-                style="@buttonStyle"
+        var region = i; // Capture for closure
+        <button class="region-button @(region == _activeRegion ? "selected" : "")"
+                style="background-color: @RegionColors[region]"
                 @onclick="() => SetActiveRegion(region)">
             @region
         </button>
@@ -76,14 +80,14 @@
     /// </summary>
     private static readonly string[] RegionColors =
     [
-        "#FFFFFF", // 0 - White
-        "#CCCCCC", // 1 - Light Grey
-        "#45B7D1", // 2 - Blue
-        "#F06767", // 3 - Red
-        "#FECA57", // 4 - Yellow
-        "#FF9FF3", // 5 - Pink
-        "#AD6FF7", // 6 - Purple
-        "#8BAD45" // 7 - Green
+        "#eeeeee", // 0 - White
+        "#ff7b60", // 1 - Red
+        "#e6f388", // 2 - Light Green
+        "#bba3e2", // 3 - Light Purple
+        "#b9b29e", // 4 - Dark Grey
+        "#b3dfa0", // 5 - Green
+        "#ffc992", // 6 - Light Orange
+        "#96beff" // 7 - Blue
     ];
 
     /// <summary>
@@ -111,6 +115,22 @@
     {
         var region = _grid.GetRegionForCell(pos);
         return RegionColors[region];
+    }
+
+    private RenderFragment? GetCellContent(Pos pos)
+    {
+        if (_grid.Solutions.Contains(pos))
+            return @<span class="queen-symbol">♛</span>;
+        return null;
+    }
+
+    private void OnSolutionFound(List<Pos> solution)
+    {
+        // Store the solution positions
+        foreach (var pos in solution)
+        {
+            _grid.Solutions.Add(pos);
+        }
     }
 
 }
