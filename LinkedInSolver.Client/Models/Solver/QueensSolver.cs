@@ -1,10 +1,9 @@
 ﻿namespace LinkedInSolver.Client.Models.Solver;
 
-public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
+public class QueensSolver(QueensGrid grid) : PuzzleSolver
 {
     public override string? Validate()
     {
-        var grid = (QueensGrid)PuzzleGrid;
         var state = grid.State;
 
         // Number of regions equals grid size
@@ -60,7 +59,6 @@ public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
     /// <returns>List of cells where the queens should be placed, empty if not solvable</returns>
     public override List<Pos> Solve()
     {
-        var grid = (QueensGrid)PuzzleGrid;
         var state = grid.State;
 
         // The approach is simple: go through each region and try to place a queen in each cell. For
@@ -88,7 +86,7 @@ public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
     /// <param name="queens">Position of queens that are already placed</param>
     /// <param name="pos">Position being checked</param>
     /// <returns>Whether we can place a new queen at pos</returns>
-    private bool CanPlaceQueen(HashSet<Pos> queens, Pos pos)
+    private static bool CanPlaceQueen(HashSet<Pos> queens, Pos pos)
     {
         // No queens placed yet, a new queen can always be placed
         if (queens.Count == 0) return true;
@@ -109,7 +107,8 @@ public class QueensSolver(QueensGrid grid) : PuzzleSolver(grid)
     /// <param name="queens">The placed queens so far</param>
     /// <param name="regionIndex">Index of the region where we are trying to place a new queen</param>
     /// <returns>List of cells where the queens should be placed, empty if not solvable</returns>
-    private List<Pos> SolveImpl(List<List<Pos>> regions, HashSet<Pos> queens, int regionIndex)
+    private static List<Pos> SolveImpl(List<List<Pos>> regions, HashSet<Pos> queens,
+        int regionIndex)
     {
         // Terminal: queens placed in all regions, return the current set of queens
         if (regionIndex >= regions.Count) return queens.ToList();

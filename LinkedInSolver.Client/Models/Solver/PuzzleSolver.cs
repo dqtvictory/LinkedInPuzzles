@@ -3,13 +3,8 @@
 /// <summary>
 ///     Shared interface for puzzle solutions
 /// </summary>
-public abstract class PuzzleSolver(Grid grid)
+public abstract class PuzzleSolver
 {
-    /// <summary>
-    ///     The puzzle grid to solve
-    /// </summary>
-    protected readonly Grid PuzzleGrid = grid;
-
     /// <summary>
     ///     Validate the grid's state
     /// </summary>

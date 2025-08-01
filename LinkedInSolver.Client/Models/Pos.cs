@@ -18,7 +18,7 @@ public readonly record struct Pos(int Row, int Col)
     }
 
     private static readonly Pos[] DeltaDirections =
-    {
+    [
         new(-1, 0), // Up
         new(1, 0), // Down
         new(0, -1), // Left
@@ -27,7 +27,7 @@ public readonly record struct Pos(int Row, int Col)
         new(-1, 1), // TopRight
         new(1, -1), // BottomLeft
         new(1, 1) // BottomRight
-    };
+    ];
 
     /// <summary>
     ///     An invalid position
