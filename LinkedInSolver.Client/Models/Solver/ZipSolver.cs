@@ -1,6 +1,6 @@
 ﻿namespace LinkedInSolver.Client.Models.Solver;
 
-public class ZipSolver(ZipGrid puzzleGrid) : PuzzleSolver
+public class ZipSolver(ZipGrid grid) : PuzzleSolver
 {
     public override string? Validate()
     {
