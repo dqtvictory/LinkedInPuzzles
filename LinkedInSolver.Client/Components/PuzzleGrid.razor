@@ -128,13 +128,13 @@
                     }
                     else
                     {
-                        <span>Validate and Solve</span>
+                        <span>Solve</span>
                     }
                 </MudButton>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OnResizeGrid"
                            Disabled="@_solverRunning"
                            Style="margin: 8px">
-                    Reset Grid
+                    Reset
                 </MudButton>
                 <MudTextField @bind-Value="_gridSizeInput" Label="Grid Size" Variant="Variant.Outlined"
                               Margin="Margin.Dense"
@@ -344,10 +344,12 @@
             return;
         }
 
-        if (_gridSizeInput is < Grid.MinSize or > Grid.MaxSize)
+        if (_gridSizeInput < CurrentGrid.MinSize || _gridSizeInput > CurrentGrid.MaxSize)
         {
             _showError = true;
-            _errorMessage = $"Grid Size should be between {Grid.MinSize} and {Grid.MaxSize}";
+            _errorMessage = CurrentGrid.MinSize == CurrentGrid.MaxSize
+                ? $"Size can only be {CurrentGrid.MinSize}"
+                : $"Grid Size should be between {CurrentGrid.MinSize} and {CurrentGrid.MaxSize}";
             StateHasChanged();
             return;
         }

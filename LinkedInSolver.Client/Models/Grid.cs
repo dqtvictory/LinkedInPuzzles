@@ -7,11 +7,10 @@ namespace LinkedInSolver.Client.Models;
 /// </summary>
 public abstract class Grid
 {
-    // Some default constants
-    public const int
-        DefaultSize = 6,
-        MinSize = 4,
-        MaxSize = 16;
+    /// <summary>
+    ///     Default grid's size
+    /// </summary>
+    public const int DefaultSize = 6;
 
     /// <summary>
     ///     The solver that will be used to solve the grid
@@ -25,6 +24,16 @@ public abstract class Grid
     {
         Reset(size);
     }
+
+    /// <summary>
+    ///     Allowed minimum size of the grid
+    /// </summary>
+    public abstract int MinSize { get; }
+
+    /// <summary>
+    ///     Allowed maximum size of the grid
+    /// </summary>
+    public abstract int MaxSize { get; }
 
     /// <summary>
     ///     Size of the square grid

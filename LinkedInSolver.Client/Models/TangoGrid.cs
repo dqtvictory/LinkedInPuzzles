@@ -34,6 +34,9 @@ public class TangoGrid(int size) : Grid(size)
     /// </summary>
     public Dictionary<(Pos, Pos), BorderType> Borders { get; private set; } = null!;
 
+    public override int MinSize => 6;
+    public override int MaxSize => 6;
+
     protected override void ResetState()
     {
         Solver = new TangoSolver(this);

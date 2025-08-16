@@ -4,15 +4,18 @@ namespace LinkedInSolver.Client.Models;
 
 public class ZipGrid(int size) : Grid(size)
 {
+    /// Collection of walls between cells, represented as pairs of positions where first position
+    /// is always compared less than second
+    public HashSet<(Pos, Pos)> Walls { get; private set; } = null!;
+
     /// Map from a number to a position
     public Pos[] NumToPos { get; private set; } = null!;
 
     /// Map from a position to a number. If 0, the cell is empty
     public int[,] PosToNum { get; private set; } = null!;
 
-    /// Collection of walls between cells, represented as pairs of positions where first position
-    /// is always compared less than second
-    public HashSet<(Pos, Pos)> Walls { get; private set; } = null!;
+    public override int MinSize => 6;
+    public override int MaxSize => 12;
 
     protected override void ResetState()
     {

@@ -9,6 +9,9 @@ public class QueensGrid(int size) : Grid(size)
     /// </summary>
     public int[,] State { get; private set; } = null!;
 
+    public override int MinSize => 6;
+    public override int MaxSize => 12;
+
     protected override void ResetState()
     {
         Solver = new QueensSolver(this);
