@@ -11,7 +11,8 @@ public record Puzzle(string Name, string Description, string Icon, string Route)
     [
         new("Zip", "Complete the path", "zip.svg", "/zip"),
         new("Tango", "Harmonize the grid", "tango.svg", "/tango"),
-        new("Queens", "Crown each region", "queens.svg", "/queens")
+        new("Queens", "Crown each region", "queens.svg", "/queens"),
+        new("Mini Sudoku", "The classic game, made mini", "sudoku.svg", "/sudoku")
     ];
 
     /// <summary>

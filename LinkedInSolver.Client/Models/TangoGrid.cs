@@ -34,8 +34,10 @@ public class TangoGrid(int size) : Grid(size)
     /// </summary>
     public Dictionary<(Pos, Pos), BorderType> Borders { get; private set; } = null!;
 
-    public override int MinSize => 6;
-    public override int MaxSize => 6;
+    public override string? ValidateInputSize(int inputSize)
+    {
+        return inputSize is 6 or 8 ? null : "Size must be 6 or 8";
+    }
 
     protected override void ResetState()
     {

@@ -16,13 +16,9 @@
         height: 50px;
         border: 2px solid #333;
         border-radius: 8px;
-        font-size: 18px;
-        font-weight: bold;
         cursor: pointer;
         transition: all 0.2s ease;
         display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .region-button:hover {
@@ -62,13 +58,8 @@
         <button class="region-button @(region == _activeRegion ? "selected" : "")"
                 style="background-color: @RegionColors[region]"
                 @onclick="() => SetActiveRegion(region)">
-            @region
         </button>
     }
-</div>
-
-<div class="active-region-display">
-    Active region: <span style="color: @RegionColors[_activeRegion]; font-weight: bold;">@_activeRegion</span>
 </div>
 
 @code {

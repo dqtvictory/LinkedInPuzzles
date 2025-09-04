@@ -2,28 +2,29 @@
 
 public class TangoSolver(TangoGrid grid) : PuzzleSolver
 {
+    private const int MaxConsecutiveMoonsOrSuns = 3;
     private readonly int[] _colMoonCount = new int[grid.Size];
     private readonly int[] _colSunCount = new int[grid.Size];
+
+    private readonly int _maxMoonsOrSuns = grid.Size / 2;
 
     private readonly int[] _rowMoonCount = new int[grid.Size];
     private readonly int[] _rowSunCount = new int[grid.Size];
 
     /// <summary>
-    ///     The state of the Tango puzzle grid, frequently updated during the solving process
+    ///     The state of the puzzle grid, frequently updated while solving.
     /// </summary>
     private TangoGrid.CellType[,] _state = null!;
 
     public override string? Validate()
     {
-        // Size of grid must be 6 by 6
-        if (grid.Size != 6)
-            return $"Size of grid must be 6, but was {grid.Size}";
-
         if (!ValidateNumMoonsAndSuns())
-            return "Each row and column must not contain more than 3 Moons or 3 Suns";
+            return
+                $"Each row and column must not contain more than {_maxMoonsOrSuns} Moons or {_maxMoonsOrSuns} Suns";
 
-        if (!ValidateAdjacentMoonsOrSun())
-            return "Found 3 adjacent Moons or Suns in a row or column";
+        if (!ValidateConsecutiveMoonsOrSun())
+            return
+                $"Found {MaxConsecutiveMoonsOrSuns} consecutive Moons or Suns in a row or column";
 
         if (!ValidateBorders())
             return "Puzzle cannot be solved due to invalid border state";
@@ -60,11 +61,10 @@ public class TangoSolver(TangoGrid grid) : PuzzleSolver
     }
 
     /// <summary>
-    ///     Check that each row and column must not contain more than 3 Moons or 3 Suns
+    ///     Check that each row and column must not contain more Moons or Suns than grid's half size
     /// </summary>
     private bool ValidateNumMoonsAndSuns()
     {
-        // Check that each row and column must not contain more than 3 Moons or 3 Suns
         for (var i = 0; i < grid.Size; i++)
         {
             var (rowMoonCount, rowSunCount) = (0, 0);
@@ -76,8 +76,8 @@ public class TangoSolver(TangoGrid grid) : PuzzleSolver
                 colMoonCount += grid.Cells[j, i] == TangoGrid.CellType.Moon ? 1 : 0;
                 colSunCount += grid.Cells[j, i] == TangoGrid.CellType.Sun ? 1 : 0;
 
-                if (rowMoonCount > 3 || rowSunCount > 3 ||
-                    colMoonCount > 3 || colSunCount > 3)
+                if (rowMoonCount > _maxMoonsOrSuns || rowSunCount > _maxMoonsOrSuns ||
+                    colMoonCount > _maxMoonsOrSuns || colSunCount > _maxMoonsOrSuns)
                     return false;
             }
 
@@ -92,33 +92,39 @@ public class TangoSolver(TangoGrid grid) : PuzzleSolver
     }
 
     /// <summary>
-    ///     Check that no 3 adjacent cells in a row or column contain all Moons or all Suns
+    ///     Check for consecutive cells in a row or column contain all Moons or all Suns
     /// </summary>
-    private bool ValidateAdjacentMoonsOrSun()
+    private bool ValidateConsecutiveMoonsOrSun()
     {
         // Validate rows
         for (var row = 0; row < grid.Size; row++)
-        for (var col = 0; col < grid.Size - 2; col++)
+        for (var col = 0; col < grid.Size - MaxConsecutiveMoonsOrSuns + 1; col++)
         {
-            var cellType1 = grid.Cells[row, col];
-            var cellType2 = grid.Cells[row, col + 1];
-            var cellType3 = grid.Cells[row, col + 2];
+            var baseCell = grid.Cells[row, col];
+            if (baseCell == TangoGrid.CellType.Empty)
+                continue;
 
-            if (cellType1 == cellType2 && cellType1 == cellType3 &&
-                cellType1 != TangoGrid.CellType.Empty)
+            var ok = false;
+            for (var i = 1; !ok && i < MaxConsecutiveMoonsOrSuns; i++)
+                if (grid.Cells[row, col + i] != baseCell)
+                    ok = true;
+            if (!ok)
                 return false;
         }
 
         // Validate columns
         for (var col = 0; col < grid.Size; col++)
-        for (var row = 0; row < grid.Size - 2; row++)
+        for (var row = 0; row < grid.Size - MaxConsecutiveMoonsOrSuns + 1; row++)
         {
-            var cellType1 = grid.Cells[row, col];
-            var cellType2 = grid.Cells[row + 1, col];
-            var cellType3 = grid.Cells[row + 2, col];
+            var baseCell = grid.Cells[row, col];
+            if (baseCell == TangoGrid.CellType.Empty)
+                continue;
 
-            if (cellType1 == cellType2 && cellType1 == cellType3 &&
-                cellType1 != TangoGrid.CellType.Empty)
+            var ok = false;
+            for (var i = 1; !ok && i < MaxConsecutiveMoonsOrSuns; i++)
+                if (grid.Cells[row + i, col] != baseCell)
+                    ok = true;
+            if (!ok)
                 return false;
         }
 
@@ -193,9 +199,8 @@ public class TangoSolver(TangoGrid grid) : PuzzleSolver
 
         var row = i / grid.Size;
         var col = i % grid.Size;
-        var originalCellType = grid.Cells[row, col];
 
-        if (originalCellType != TangoGrid.CellType.Empty)
+        if (grid.Cells[row, col] != TangoGrid.CellType.Empty)
             // Cell is pre-placed. Cannot modify, move to the next cell
             return SolveImpl(i + 1);
 
@@ -239,9 +244,9 @@ public class TangoSolver(TangoGrid grid) : PuzzleSolver
     /// </summary>
     private bool ValidateCellPlacement(int row, int col)
     {
-        // Check that the current row and column do not exceed 3 Moons or Suns
-        if (_rowMoonCount[row] > 3 || _rowSunCount[row] > 3 ||
-            _colMoonCount[col] > 3 || _colSunCount[col] > 3)
+        // Check that the current row and column do not exceed half size of Moons or Suns
+        if (_rowMoonCount[row] > _maxMoonsOrSuns || _rowSunCount[row] > _maxMoonsOrSuns ||
+            _colMoonCount[col] > _maxMoonsOrSuns || _colSunCount[col] > _maxMoonsOrSuns)
             return false;
 
         // Check whether current cell placement respect the border rules
@@ -250,25 +255,37 @@ public class TangoSolver(TangoGrid grid) : PuzzleSolver
                 grid.IsInBounds(neighbor) && !ValidateAdjacentCellsForPlacement(pos, neighbor)))
             return false;
 
-        for (var r = Math.Max(row - 2, 0); r <= Math.Min(grid.Size - 3, row); r++)
+        for (var r = Math.Max(row - MaxConsecutiveMoonsOrSuns + 1, 0);
+             r <= Math.Min(grid.Size - MaxConsecutiveMoonsOrSuns, row);
+             r++)
         {
-            // Check this column for 3 adjacent Moons or Suns
-            var cellType1 = _state[r, col];
-            var cellType2 = _state[r + 1, col];
-            var cellType3 = _state[r + 2, col];
-            if (cellType1 == cellType2 && cellType1 == cellType3 &&
-                cellType1 != TangoGrid.CellType.Empty)
+            // Check this column for consecutive Moons or Suns
+            var baseCell = _state[r, col];
+            if (baseCell == TangoGrid.CellType.Empty)
+                continue;
+
+            var ok = false;
+            for (var i = 1; !ok && i < MaxConsecutiveMoonsOrSuns; i++)
+                if (_state[r + i, col] != baseCell)
+                    ok = true;
+            if (!ok)
                 return false;
         }
 
-        for (var c = Math.Max(col - 2, 0); c <= Math.Min(grid.Size - 3, col); c++)
+        for (var c = Math.Max(col - MaxConsecutiveMoonsOrSuns + 1, 0);
+             c <= Math.Min(grid.Size - MaxConsecutiveMoonsOrSuns, col);
+             c++)
         {
-            // Check this row for 3 adjacent Moons or Suns
-            var cellType1 = _state[row, c];
-            var cellType2 = _state[row, c + 1];
-            var cellType3 = _state[row, c + 2];
-            if (cellType1 == cellType2 && cellType1 == cellType3 &&
-                cellType1 != TangoGrid.CellType.Empty)
+            // Check this row for consecutive Moons or Suns
+            var baseCell = _state[row, c];
+            if (baseCell == TangoGrid.CellType.Empty)
+                continue;
+
+            var ok = false;
+            for (var i = 1; !ok && i < MaxConsecutiveMoonsOrSuns; i++)
+                if (_state[row, c + i] != baseCell)
+                    ok = true;
+            if (!ok)
                 return false;
         }
 

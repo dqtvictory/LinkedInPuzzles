@@ -9,17 +9,15 @@ public class QueensGrid(int size) : Grid(size)
     /// </summary>
     public int[,] State { get; private set; } = null!;
 
-    public override int MinSize => 6;
-    public override int MaxSize => 12;
+    public override string? ValidateInputSize(int inputSize)
+    {
+        return inputSize is >= 6 and <= 12 ? null : "Size must be between 6 and 12";
+    }
 
     protected override void ResetState()
     {
         Solver = new QueensSolver(this);
         State = new int[Size, Size];
-        // Assign every cell to region 0 initially
-        for (var row = 0; row < Size; row++)
-        for (var col = 0; col < Size; col++)
-            State[row, col] = 0;
     }
 
     /// <summary>

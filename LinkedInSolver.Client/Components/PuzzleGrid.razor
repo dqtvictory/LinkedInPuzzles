@@ -344,12 +344,11 @@
             return;
         }
 
-        if (_gridSizeInput < CurrentGrid.MinSize || _gridSizeInput > CurrentGrid.MaxSize)
+        var sizeValidation = CurrentGrid.ValidateInputSize(_gridSizeInput);
+        if (sizeValidation != null)
         {
             _showError = true;
-            _errorMessage = CurrentGrid.MinSize == CurrentGrid.MaxSize
-                ? $"Size can only be {CurrentGrid.MinSize}"
-                : $"Grid Size should be between {CurrentGrid.MinSize} and {CurrentGrid.MaxSize}";
+            _errorMessage = sizeValidation;
             StateHasChanged();
             return;
         }

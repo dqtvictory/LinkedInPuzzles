@@ -26,16 +26,6 @@ public abstract class Grid
     }
 
     /// <summary>
-    ///     Allowed minimum size of the grid
-    /// </summary>
-    public abstract int MinSize { get; }
-
-    /// <summary>
-    ///     Allowed maximum size of the grid
-    /// </summary>
-    public abstract int MaxSize { get; }
-
-    /// <summary>
     ///     Size of the square grid
     /// </summary>
     public int Size { get; private set; } = DefaultSize;
@@ -72,6 +62,16 @@ public abstract class Grid
     {
         return Solution != null && Solution.Any();
     }
+
+    /// <summary>
+    ///     Validate the input new size from the UI for this grid type
+    /// </summary>
+    /// <param name="inputSize">New size of the grid being validated</param>
+    /// <returns>
+    ///     If non-null, an error message which states why it's not valid, otherwise null if new
+    ///     size is valid for the grid
+    /// </returns>
+    public abstract string? ValidateInputSize(int inputSize);
 
     /// <summary>
     ///     Reset grid's state

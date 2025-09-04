@@ -14,8 +14,10 @@ public class ZipGrid(int size) : Grid(size)
     /// Map from a position to a number. If 0, the cell is empty
     public int[,] PosToNum { get; private set; } = null!;
 
-    public override int MinSize => 6;
-    public override int MaxSize => 12;
+    public override string? ValidateInputSize(int inputSize)
+    {
+        return inputSize is >= 6 and <= 12 ? null : "Size must be between 6 and 12";
+    }
 
     protected override void ResetState()
     {
