@@ -1,0 +1,41 @@
+<style>
+    .puzzle-content {
+        transition: opacity 0.3s ease;
+    }
+</style>
+
+<PageTitle>@PuzzleName - LinkedIn Solver</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudBreadcrumbs Items="_breadcrumbItems" Class="mb-4"/>
+
+    <div class="puzzle-content">
+        <div class="d-flex align-center mb-4">
+            <img src="@PuzzleIcon" alt="@PuzzleName"
+                 style="width: 48px; height: 48px; margin-right: 16px;"/>
+            <MudText Typo="Typo.h4" GutterBottom="false">
+                @PuzzleName - coming soon...
+            </MudText>
+        </div>
+    </div>
+</MudContainer>
+
+@code {
+    [Parameter] public required string PuzzleName { get; set; }
+    [Parameter] public required string PuzzleIcon { get; set; }
+
+    /// <summary>
+    ///     Breadcrumb items for navigation
+    /// </summary>
+    private List<BreadcrumbItem> _breadcrumbItems = null!;
+
+    protected override void OnInitialized()
+    {
+        _breadcrumbItems =
+        [
+            new BreadcrumbItem("Home", "/", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem(PuzzleName, null, true)
+        ];
+    }
+
+}

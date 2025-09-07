@@ -31,9 +31,11 @@
     }
 </style>
 
-<PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid" PageGetCellClasses="GetCellClasses"
-            PageGetCellContent="GetCellContent" PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick"
-            PageOnSolutionFound="OnSolutionFound"/>
+@* <PuzzleGrid CurrentPuzzle="Puzzle" CurrentGrid="_grid" PageGetCellClasses="GetCellClasses" *@
+@*             PageGetCellContent="GetCellContent" PageOnCellClick="OnCellClick" PageOnBorderClick="OnBorderClick" *@
+@*             PageOnSolutionFound="OnSolutionFound"/> *@
+
+<PuzzleComingSoon PuzzleName="@Puzzle.Name" PuzzleIcon="@Puzzle.Icon"/>
 
 @code {
     private static readonly Puzzle Puzzle = Puzzle.GetPuzzle("Zip");
